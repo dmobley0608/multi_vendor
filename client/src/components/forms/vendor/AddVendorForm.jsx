@@ -1,8 +1,8 @@
 
 import React, { useEffect, useState } from 'react'
 import { Col, FloatingLabel, Form, Row, Button, Spinner } from 'react-bootstrap'
-import { useAddVendorMutation, useUpdateVendorMutation } from '../../../services/VendorApi'
-import { useCreateUserMutation } from '../../../services/UserApi'
+import { useAddVendorMutation, useUpdateVendorMutation } from '../../../services/Api'
+import { useCreateUserMutation } from '../../../services/Api'
 import Swal from 'sweetalert2'
 
 export default function AddVendorForm({ vendor }) {
@@ -99,7 +99,7 @@ export default function AddVendorForm({ vendor }) {
             password: createPassword(),
             balance: vendor?.balance ? parseFloat(vendor.balance / 100).toFixed(2) : '0.00'
         })
-        
+
     }, [vendor])
     return (
         <>

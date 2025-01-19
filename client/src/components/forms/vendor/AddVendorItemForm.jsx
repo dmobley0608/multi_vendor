@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Col, FloatingLabel, Form, Row, Spinner } from 'react-bootstrap'
-import { useAddVendorItemMutation, useUpdateVendorItemMutation } from '../../../services/VendorApi'
+import { useAddVendorItemMutation, useUpdateVendorItemMutation } from '../../../services/Api'
 import Swal from 'sweetalert2'
 
 export default function AddVendorItemForm({ vendor, vendorItem }) {

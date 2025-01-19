@@ -3,7 +3,7 @@ import LoginForm from '../components/forms/LoginForm'
 import { setUser } from '../redux/UserSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
-import { useGetUserQuery } from '../services/UserApi'
+import { useGetUserQuery } from '../services/Api'
 
 const Login = () => {
 

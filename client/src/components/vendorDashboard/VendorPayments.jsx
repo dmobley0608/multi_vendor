@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Table, Pagination } from 'react-bootstrap'
-import { useGetVendorByIdQuery } from '../../services/vendorApi'
+import { useGetVendorByIdQuery } from '../../services/Api'
 
 export default function VendorPayments() {
   const { data: vendorData } = useGetVendorByIdQuery(5487) // Assuming vendor ID is 5487

@@ -7,8 +7,23 @@ const getTokenKey = () => {
   return localStorage.getItem('token')
 }
 
-export const VendorApi = createApi({
-  reducerPath: 'vendorApi',
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+export const Api = createApi({
+  reducerPath: 'api',
   baseQuery: fetchBaseQuery({
     baseUrl: `${import.meta.env.VITE_API_URL}/`,
     prepareHeaders: (headers, { getState }) => {
@@ -16,11 +31,51 @@ export const VendorApi = createApi({
       if (token) {
         headers.set('Authorization', `Token ${token}`)
       }
+      const csrfToken = getCookie('csrftoken');
+      if (csrfToken) {
+        headers.set('X-CSRFToken', csrfToken)
+      }
       return headers
     }
   }),
-  tagTypes: ['VENDOR', 'VENDORS'],
+  tagTypes: ['USER', 'VENDOR', 'VENDORS'],
   endpoints: (builder) => ({
+    // User endpoints
+    getUser: builder.query({
+      query: () => 'user/me/',
+      providesTags: ['USER']
+    }),
+    createUser: builder.mutation({
+      query: (body) => ({
+        url: 'user/create/',
+        method: 'post',
+        body: body
+      }),
+      invalidatesTags: ['USER', 'VENDOR', 'VENDORS']
+    }),
+    updateUser: builder.mutation({
+      query: (body) => ({
+        url: 'user/me/',
+        method: 'put',
+        body: body
+      }),
+      invalidatesTags: ['USER', 'VENDOR', 'VENDORS']
+    }),
+    login: builder.mutation({
+      query: (body) => ({
+        url: 'user/token/',
+        method: 'post',
+        body: body,
+      }),
+    }),
+    signOut: builder.mutation({
+      queryFn: () => {
+        localStorage.clear();
+        return []
+      },
+      invalidatesTags: ['USER']
+    }),
+    // Vendor endpoints
     getVendors: builder.query({
       query: (page = 1) => `vendor/?page=${page}`,
       providesTags: ['VENDORS']
@@ -31,7 +86,7 @@ export const VendorApi = createApi({
         method: 'post',
         body: body
       }),
-      invalidatesTags: ['VENDORS']
+      invalidatesTags: ['USER', 'VENDOR', 'VENDORS']
     }),
     getVendorById: builder.query({
       query: (id) => `vendor/${id}`,
@@ -47,14 +102,14 @@ export const VendorApi = createApi({
         method: 'put',
         body: body
       }),
-      invalidatesTags: ['VENDOR', 'VENDORS']
+      invalidatesTags: ['USER', 'VENDOR', 'VENDORS']
     }),
     deleteVendor: builder.mutation({
       query: (id) => ({
         url: `vendor/${id}/`,
         method: 'delete',
       }),
-      invalidatesTags: ['VENDOR', 'VENDORS']
+      invalidatesTags: ['USER', 'VENDOR', 'VENDORS']
     }),
     addVendorItem: builder.mutation({
       query: (body) => ({
@@ -85,14 +140,14 @@ export const VendorApi = createApi({
         method: 'post',
         body: body
       }),
-      invalidatesTags: ['VENDOR', 'VENDORS']
+      invalidatesTags: ['USER', 'VENDOR', 'VENDORS']
     }),
     deleteVendorPayment: builder.mutation({
       query: (id) => ({
         url: `vendor-payment/${id}/`,
         method: 'delete',
       }),
-      invalidatesTags: ['VENDOR', 'VENDORS']
+      invalidatesTags: ['USER', 'VENDOR', 'VENDORS']
     }),
     getVendorItems: builder.query({
       query: () => 'vendor-item',
@@ -101,6 +156,12 @@ export const VendorApi = createApi({
 })
 
 export const {
+  useGetUserQuery,
+  useLazyGetUserQuery,
+  useCreateUserMutation,
+  useUpdateUserMutation,
+  useLoginMutation,
+  useSignOutMutation,
   useGetVendorsQuery,
   useAddVendorMutation,
   useGetVendorByIdQuery,
@@ -113,4 +174,4 @@ export const {
   useAddVendorPaymentMutation,
   useDeleteVendorPaymentMutation,
   useGetVendorItemsQuery
-} = VendorApi
+} = Api

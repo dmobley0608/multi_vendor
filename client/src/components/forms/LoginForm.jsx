@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { useLazyGetUserQuery, useLoginMutation } from '../../services/UserApi';
-import { useDispatch } from 'react-redux';
-import { setUser } from '../../redux/UserSlice';
-import { setLoadingFalse, setLoadingTrue } from '../../redux/LoadingSlice';
+import { useLazyGetUserQuery, useLoginMutation } from '../../services/Api';
 import { Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 

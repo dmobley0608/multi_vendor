@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from 'react'
-import { Button, Col, Container, Modal, Nav, Row, Stack, Tab, Table } from 'react-bootstrap'
+import React from 'react'
+import { Col, Container, Nav, Row, Stack, Tab, Table } from 'react-bootstrap'
 import { useParams } from 'react-router'
-import { useDeleteVendorItemMutation, useDeleteVendorPaymentMutation, useGetVendorByIdQuery } from '../../../services/VendorApi'
-import AddVendorItemForm from '../../../components/forms/vendor/AddVendorItemForm'
-import Swal from 'sweetalert2'
-import EditButton from '../../../components/EditButton'
-import DeleteButton from '../../../components/DeleteButton'
+import {  useGetVendorByIdQuery } from '../../../services/Api'
+
 import VendorPaymentsTable from '../../../components/tables/VendorPaymentsTable'
 import VendorItemTable from '../../../components/tables/VendorItemTable'
 

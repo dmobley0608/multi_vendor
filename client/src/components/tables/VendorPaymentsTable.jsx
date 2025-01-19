@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Pagination from 'react-bootstrap/Pagination';
 import { useState } from 'react';
 import { BiDollarCircle, BiDownArrow, BiTrash, BiUpArrow } from 'react-icons/bi';
-import { useDeleteVendorPaymentMutation } from '../../services/VendorApi';
+import { useDeleteVendorPaymentMutation } from '../../services/Api';
 import { Col, Modal, Row } from 'react-bootstrap';
 import AddVendorPaymentForm from '../forms/vendor/AddVendorPaymentForm';
 

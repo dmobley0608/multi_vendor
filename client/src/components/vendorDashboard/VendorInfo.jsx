@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Row, Col, Button, ListGroup, Modal, Form } from 'react-bootstrap'
-import { useGetVendorByIdQuery, useUpdateVendorMutation } from '../../services/vendorApi'
+import { useGetVendorByIdQuery, useUpdateVendorMutation } from '../../services/Api'
 import Swal from 'sweetalert2'
 import { FaEdit } from 'react-icons/fa'
 

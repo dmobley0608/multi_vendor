@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Row, Col, Button, Tab, Tabs, ListGroup, Modal, Form, Table, Badge } from 'react-bootstrap'
-import { useGetVendorByUserQuery, useUpdateVendorMutation } from '../../services/vendorApi'
+import { useGetVendorByUserQuery, useUpdateVendorMutation } from '../../services/Api'
 import { useGetMessagesQuery } from '../../services/MessageApi'
 import Swal from 'sweetalert2'
 import { FaEdit, FaInbox } from 'react-icons/fa'

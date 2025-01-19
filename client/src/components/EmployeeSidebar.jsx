@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, Nav, NavItem, Stack } from 'react-bootstrap'
 import { Link, NavLink, useNavigate } from 'react-router'
-import { useSignOutMutation } from '../services/UserApi'
+import { useSignOutMutation } from '../services/Api'
 
 
 export default function EmployeeSidebar() {

@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
-import { useLazyGetUserQuery } from '../services/UserApi'
-import { setUser } from '../redux/UserSlice'
+import { useLazyGetUserQuery } from '../services/Api'
+
 
 export default function Homepage({user}) {
 

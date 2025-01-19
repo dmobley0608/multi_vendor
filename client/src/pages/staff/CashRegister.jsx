@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useGetVendorsQuery } from '../../services/VendorApi';
+import { useGetVendorsQuery } from '../../services/Api';
 import { useCreateTransactionMutation } from '../../services/TransactionApi';
 import { Form, Button, Container, Row, Col, ListGroup, Spinner, Table, Modal } from 'react-bootstrap';
 import { FaShoppingCart, FaCog } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import './CashRegister.styles.css';
-import { printInvoice } from '../../utils';
+
 
 export default function CashRegister() {
   const [items, setItems] = useState([]);

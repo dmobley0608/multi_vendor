@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Table, Button, Modal, Form, Pagination } from 'react-bootstrap'
-import { useGetVendorByIdQuery, useUpdateVendorItemMutation, useAddVendorItemMutation } from '../../services/vendorApi'
+import { useGetVendorByIdQuery, useUpdateVendorItemMutation, useAddVendorItemMutation } from '../../services/Api'
 import { FaEdit, FaPlus } from 'react-icons/fa'
 
 export default function VendorItems() {

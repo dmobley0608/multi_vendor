@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLazyGetTransactionsQuery } from '../../services/TransactionApi';
-import { useGetVendorItemsQuery } from '../../services/VendorApi';
+import { useGetVendorItemsQuery } from '../../services/Api';
 import { Form, Button, Table, Collapse, Row, Col, Modal } from 'react-bootstrap';
 import { FaPrint, FaFilter } from 'react-icons/fa';
 

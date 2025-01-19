@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Table, Button, Modal, Form, Spinner, Tabs, Tab, Badge } from 'react-bootstrap';
 import { FaInbox, FaPaperPlane, FaPlus, FaTrash, FaReply } from 'react-icons/fa';
 import { useGetMessagesQuery, useCreateMessageMutation, useDeleteMessageMutation, useMarkMessageAsReadMutation, useGetStaffQuery } from '../../services/MessageApi';
-import { useGetVendorsQuery } from '../../services/VendorApi';
+import { useGetVendorsQuery } from '../../services/Api';
 import { useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
 
 import Inbox from '../messages/Inbox';
 import Outbox from '../messages/Outbox';
-import { useGetUserQuery } from '../../services/UserApi';
+import { useGetUserQuery } from '../../services/Api';
 
 export default function Messages() {
   const { data: messages, isLoading: isMessagesLoading } = useGetMessagesQuery();

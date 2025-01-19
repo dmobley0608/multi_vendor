@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Table, Button, Pagination, Modal, Col, Row } from 'react-bootstrap'
 import { FaEdit, FaTrash } from 'react-icons/fa'
 import AddVendorItemForm from '../forms/vendor/AddVendorItemForm'
-import { useDeleteVendorItemMutation } from '../../services/VendorApi'
+import { useDeleteVendorItemMutation } from '../../services/Api'
 import { BiAddToQueue } from 'react-icons/bi'
 
 const VendorItemTable = ({ items, vendor }) => {

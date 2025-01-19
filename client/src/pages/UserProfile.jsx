@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Form, Button, Row, Col, Spinner, Nav, Tab } from 'react-bootstrap';
-import { useGetUserQuery, useUpdateUserMutation } from '../services/UserApi';
-import { useGetVendorByUserQuery, useUpdateVendorMutation } from '../services/VendorApi';
+import { useGetUserQuery, useUpdateUserMutation } from '../services/Api';
+import { useGetVendorByUserQuery, useUpdateVendorMutation } from '../services/Api';
 import Swal from 'sweetalert2';
 
 export default function UserProfile() {

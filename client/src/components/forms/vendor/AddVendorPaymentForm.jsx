@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Col, FloatingLabel, Form, Row } from 'react-bootstrap'
-import { useAddVendorPaymentMutation } from '../../../services/VendorApi'
+import { useAddVendorPaymentMutation } from '../../../services/Api'
 import Swal from 'sweetalert2'
 
 export default function AddVendorPaymentForm({ vendor }) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLazyGetTransactionsQuery } from '../../services/TransactionApi';
-import { useGetVendorsQuery } from '../../services/VendorApi';
+import { useGetVendorsQuery } from '../../services/Api';
 import { Table, Button } from 'react-bootstrap';
 
 const MonthlyReport = () => {

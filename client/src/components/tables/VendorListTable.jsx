@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Col, FormControl, Modal, Table } from 'react-bootstrap'
-import { useDeleteVendorMutation, useGetVendorsQuery } from '../../services/VendorApi'
+import { useDeleteVendorMutation, useGetVendorsQuery } from '../../services/Api'
 import AddPaymentButton from '../AddPaymentButton'
 import EditButton from '../EditButton'
 import DeleteButton from '../DeleteButton'
