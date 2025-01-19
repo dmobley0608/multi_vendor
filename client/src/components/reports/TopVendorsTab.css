@@ -1,0 +1,11 @@
+.top-vendors-title {
+  color: #000; /* Ensure the title is not faded */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #000; /* Ensure all header tags are not faded */
+}
+
+.table tbody tr td {
+  font-weight: normal; /* Ensure table row items are not bold */
+}

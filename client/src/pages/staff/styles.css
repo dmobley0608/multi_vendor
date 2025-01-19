@@ -1,0 +1,14 @@
+a{
+    text-decoration: none !important;
+    color: rgb(129, 129, 129) !important;
+    padding: 5px;
+}
+
+.active{
+    font-size: 1.05rem;
+    font-weight: bolder;
+    text-underline-offset: 8px;
+    color: whitesmoke !important;
+    background-color: rgb(112, 110, 110);
+    border-radius: 3px;
+}
