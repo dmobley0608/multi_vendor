@@ -10,6 +10,7 @@ export default function UserProfile() {
   const [updateUser] = useUpdateUserMutation();
   const [updateVendor] = useUpdateVendorMutation();
   const [formData, setFormData] = useState({
+    id: '',
     name: '',
     phone_number: '',
     new_password: '',
@@ -35,16 +36,13 @@ export default function UserProfile() {
     }
     if (vendorData) {
       setVendorFormData({
-        user:{
-          ...formData
-        },
         store_name: vendorData.store_name || '',
         street_address: vendorData.street_address || '',
         city: vendorData.city || '',
         state: vendorData.state || '',
         postal_code: vendorData.postal_code || '',
       });
-      console.log(vendorFormData)
+
     }
   }, [user, vendorData]);
 
@@ -63,7 +61,17 @@ export default function UserProfile() {
     try {
 
       if (vendorData) {
-        let res = await updateVendor({ id: vendorData.id, items:[],user:{id:user.id,...formData}, ...vendorFormData });
+        console.log('Vendor', vendorFormData)
+        let body = {
+          id: vendorData.id,
+          items:[],
+          user:{
+            id:user.id,
+            name:formData.name,
+            phone_number:formData.phone_number
+          },
+          ...vendorFormData }
+        let res = await updateVendor(body);
         console.log(res)
         if(res.error){
           Swal.fire('Error', 'Failed to update information', 'error');

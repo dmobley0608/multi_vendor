@@ -71,7 +71,7 @@ Helen Underground is a full-stack web application that uses React for the fronte
     ```
 3. Start the development server:
     ```bash
-    npm start
+    npm run dev
     ```
 
 ## Usage
