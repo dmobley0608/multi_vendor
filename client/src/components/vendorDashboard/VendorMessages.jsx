@@ -14,6 +14,7 @@ export default function Messages() {
   const { data: messages, isLoading: isMessagesLoading } = useGetMessagesQuery();
   const { data: user, isLoading: isUserLoading } = useGetUserQuery();
   const { data: vendors, isLoading: isVendorsLoading } = useGetVendorsQuery();
+  const { data: staff, isLoading: isStaffLoading } = useGetStaffQuery();
   const [createMessage] = useCreateMessageMutation();
   const [deleteMessage] = useDeleteMessageMutation();
   const [markMessageAsRead] = useMarkMessageAsReadMutation();
@@ -28,6 +29,11 @@ export default function Messages() {
   const [isReply, setIsReply] = useState(false);
 
   const handleShowModal = () => {
+    setNewMessage({
+      recipient_ids: [],
+      subject: '',
+      body: '',
+    })
     setIsReply(false);
     setShowModal(true);
   };
@@ -48,12 +54,12 @@ export default function Messages() {
   };
 
   const handleRecipientSelect = (e) => {
-    const selectedVendorId = e.target.value;
-    if (selectedVendorId === 'all') {
-      const allVendorIds = vendors.results.map(vendor => vendor.id.toString());
-      setNewMessage({ ...newMessage, recipient_ids: allVendorIds });
-    } else if (selectedVendorId && !newMessage.recipient_ids.includes(selectedVendorId)) {
-      setNewMessage({ ...newMessage, recipient_ids: [...newMessage.recipient_ids, selectedVendorId] });
+    const selectedId = e.target.value;
+    if (selectedId === 'all') {
+      const allIds = (user.is_staff ? vendors.results : staff.results).map(v => v.user.id);
+      setNewMessage({ ...newMessage, recipient_ids: allIds });
+    } else if (selectedId && !newMessage.recipient_ids.includes(selectedId)) {
+      setNewMessage({ ...newMessage, recipient_ids: [...newMessage.recipient_ids, selectedId] });
     }
   };
 
@@ -64,10 +70,40 @@ export default function Messages() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      for (const recipient_id of newMessage.recipient_ids) {
-        await createMessage({ ...newMessage, recipient_ids: [recipient_id] });
+      let count = 0
+      let errorCount = 0
+      if (user.is_staff) {
+        for (const recipient_id of newMessage.recipient_ids) {
+          const res = await createMessage({ ...newMessage, recipient_ids: [recipient_id] });
+          console.log(res)
+          if (res.data) {
+            console.log(res)
+            count++;
+          }
+          if (res.error) {
+            console.log(res.error)
+            errorCount++;
+          }
+        }
+        if (errorCount > 0) {
+          Swal.fire('Error', `Failed to send ${errorCount} message(s).`, 'error');
+          return
+        }else{
+          Swal.fire('Success', `${count} Message(s) sent successfully`, 'success');
+        }
+      } else {
+        const res = await createMessage({ ...newMessage });
+        if (res.error) {
+          Swal.fire('Error', 'Failed to send message', 'error');
+          return
+        }
+        if(res.data){
+          Swal.fire('Success', `Message sent successfully`, 'success');
+        }
+
       }
-      Swal.fire('Success', 'Message sent successfully', 'success');
+
+
       handleCloseModal();
     } catch (error) {
       console.log(error)
@@ -77,12 +113,13 @@ export default function Messages() {
 
   const handleReply = (message) => {
     setNewMessage({
-      recipient_ids: [message.sender.toString()],
+      recipient_ids: [message.sender],
       subject: `RE: ${message.subject}`,
       body: '',
     });
     setIsReply(true);
     setShowModal(true);
+    setShowViewModal(false);
   };
 
   const handleDelete = async (messageId) => {
@@ -106,7 +143,7 @@ export default function Messages() {
     }
   };
 
-  if (isMessagesLoading || isUserLoading || isVendorsLoading) {
+  if (isMessagesLoading || isUserLoading || isVendorsLoading || isStaffLoading) {
     return <Spinner animation="border" />;
   }
 
@@ -127,7 +164,7 @@ export default function Messages() {
         <Col>
           <Tabs defaultActiveKey="inbox" id="messages-tabs">
             <Tab eventKey="inbox" title={<><FaInbox /> Inbox <Badge bg="secondary">{unreadMessagesCount}</Badge></>}>
-              <Inbox messages={inboxMessages} onView={(msg) => handleShowViewModal(msg, true)} onReply={handleReply} user={user} />
+              <Inbox messages={inboxMessages} onView={(msg) => handleShowViewModal(msg, true)} onReply={handleReply} user={user} onDelete={handleDelete} />
             </Tab>
             <Tab eventKey="outbox" title={<><FaPaperPlane /> Outbox</>}>
               <Outbox messages={outboxMessages} onView={(msg) => handleShowViewModal(msg, false)} onDelete={handleDelete} user={user} />
@@ -169,35 +206,61 @@ export default function Messages() {
               </>
             )}
             {!isReply && (
-              <Form.Group controlId="recipients">
-                <Form.Label>Select Recipients</Form.Label>
-                <Form.Control as="select" onChange={handleRecipientSelect}>
-                  <option value="">Select Vendor</option>
-                  <option value="all">All Vendors</option>
-                  {vendors?.results?.map((vendor) => (
-                    <option key={vendor.id} value={vendor.id}>
-                      {vendor.store_name || vendor.user.name}
-                    </option>
-                  ))}
-                </Form.Control>
-                <div className='flex'>
-                  <div>
-                    <h6>To:</h6>
+              <>
+                <Form.Group controlId="recipients">
+                  <Form.Label>{user.is_staff ? 'Select Recipients' : 'To: STORE FRONT'}</Form.Label>
+                  {user.is_staff && <Form.Control as="select" onChange={handleRecipientSelect}>
+                    <option value="">Select Vendor</option>
+                    <option value="all">All Vendors</option>
+                    {(user.is_staff ? vendors?.results : staff?.results)?.map((item) => (
+                      <option key={item.id} value={item.user.id}>
+                        {item.store_name || item.user.name}
+                      </option>
+                    ))}
+                  </Form.Control>
+                  }
+                  <div className='flex'>
+                    <div>
+                      {user.is_Staff && <h6>To:</h6>}
+                    </div>
+                    <div className="recipient-list">
+                      {newMessage.recipient_ids.map((id, index) => {
+                        const recipient = (user.is_staff ? vendors.results : staff.results).find(v => v.user.id === parseInt(id));
+                        return (
+                          <span key={id} className="recipient-badge">
+                            {recipient?.store_name || recipient?.user.name}
+                            <Button variant="link" size="sm" onClick={() => handleRemoveRecipient(id)}>&times;</Button>
+                            {index < newMessage.recipient_ids.length - 1 && '; '}
+                          </span>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div className="recipient-list">
-                    {newMessage.recipient_ids.map((vendorId, index) => {
-                      const vendor = vendors.results.find(v => v.id === parseInt(vendorId));
-                      return (
-                        <span key={vendorId} className="recipient-badge">
-                          {vendor?.store_name || vendor?.user.name}
-                          <Button variant="link" size="sm" onClick={() => handleRemoveRecipient(vendorId)}>&times;</Button>
-                          {index < newMessage.recipient_ids.length - 1 && '; '}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </div>
-              </Form.Group>
+                </Form.Group>
+                <Form.Group controlId="subject">
+                  <Form.Label>Subject</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="subject"
+                    value={newMessage.subject}
+                    onChange={handleInputChange}
+                    placeholder="Enter subject"
+                    required
+                  />
+                </Form.Group>
+                <Form.Group controlId="body">
+                  <Form.Label>Body</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    name="body"
+                    value={newMessage.body}
+                    onChange={handleInputChange}
+                    rows={3}
+                    placeholder="Enter message"
+                    required
+                  />
+                </Form.Group>
+              </>
             )}
             <Button variant="primary" type="submit" className="mt-3">
               Send
@@ -224,9 +287,11 @@ export default function Messages() {
                   <FaReply /> Reply
                 </Button>
               )}
-              <Button variant="danger" onClick={() => handleDelete(viewMessage.id)} className="ml-2">
-                <FaTrash /> Delete
-              </Button>
+              {user.is_staff && (
+                <Button variant="danger" onClick={() => handleDelete(viewMessage.id)} className="ml-2">
+                  <FaTrash /> Delete
+                </Button>
+              )}
             </>
           )}
         </Modal.Body>

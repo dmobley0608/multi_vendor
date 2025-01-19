@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Table, Button, Modal } from 'react-bootstrap';
-import { FaInbox, FaEye, FaReply } from 'react-icons/fa';
+import { FaInbox, FaEye, FaReply, FaTrash } from 'react-icons/fa';
 
-const Inbox = ({ messages, onView, onReply, user }) => {
+const Inbox = ({ messages, onView, onReply, onDelete, user }) => {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const sortedMessages = messages?.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
@@ -20,6 +20,10 @@ const Inbox = ({ messages, onView, onReply, user }) => {
       onView(msg); // Mark as read
     }
     onReply(msg);
+  };
+
+  const handleDelete = (msg) => {
+    onDelete(msg.id);
   };
 
   return (
@@ -49,6 +53,11 @@ const Inbox = ({ messages, onView, onReply, user }) => {
                   <Button variant="" size="sm" onClick={(e) => { e.stopPropagation(); handleReply(msg); }} className="ml-2">
                     <FaReply />
                   </Button>
+                  {user.is_staff && (
+                    <Button variant="" size="sm" onClick={(e) => { e.stopPropagation(); handleDelete(msg); }} className="ml-2">
+                      <FaTrash />
+                    </Button>
+                  )}
                 </td>
               </tr>
             ))
@@ -60,7 +69,7 @@ const Inbox = ({ messages, onView, onReply, user }) => {
         </tbody>
       </Table>
 
-      
+
     </>
   );
 };

@@ -26,11 +26,11 @@ const Outbox = ({ messages, onView, onDelete, user }) => {
                 <td>{new Date(msg.timestamp).toLocaleString()}</td>
                 <td>{msg.is_read ? 'Read' : 'Unread'}</td>
                 <td>
-                  <Button variant="link" size="sm" onClick={(e) => { e.stopPropagation(); onView(msg); }} style={{ backgroundColor: 'transparent' }}>
+                  <Button variant="" size="sm" onClick={(e) => { e.stopPropagation(); onView(msg); }} style={{ backgroundColor: 'transparent' }}>
                     <FaEye />
                   </Button>
                   {(msg.sender === user.id || user.is_staff) && (
-                    <Button variant="danger" size="sm" onClick={(e) => { e.stopPropagation(); onDelete(msg.id); }} className="ml-2">
+                    <Button variant="" size="sm" onClick={(e) => { e.stopPropagation(); onDelete(msg.id); }} className="ml-2">
                       <FaTrash />
                     </Button>
                   )}

@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class MessageSerializer( serializers.ModelSerializer):
     recipients = UserSerializer(many=True, read_only=True)
-    recipient_ids = serializers.PrimaryKeyRelatedField(queryset=Vendor.objects.all(), many=True, write_only=True)
+    recipient_ids = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True, write_only=True)
     sender_email = serializers.CharField(source='sender.email', read_only=True)
 
     class Meta:
@@ -28,17 +28,16 @@ class MessageSerializer( serializers.ModelSerializer):
         message = Message.objects.create(**validated_data)
         message.sender = user
         if user.is_staff:
-            for vendor in recipient_ids:
-                message.recipients.add(vendor.user)
-                message.save()
+            for recipient in recipient_ids:
+                message.recipients.add(recipient)
         else:
             staff = User.objects.filter(is_staff=True)
             message.recipients.add(*staff)
-            message.save()
+        message.save()
         return message
 
     def update(self, instance, validated_data):
         recipient_ids = validated_data.pop('recipient_ids', [])
         instance = super().update(instance, validated_data)
-        instance.recipients.set([vendor.user for vendor in recipient_ids])
+        instance.recipients.set(recipient_ids)
         return instance
