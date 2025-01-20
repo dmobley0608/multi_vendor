@@ -38,7 +38,7 @@ export default function VendorListTable() {
         })
         if (isConfirmed) {
             const res = await deleteVendor(v.id)
-            console.log(res)
+           
             if (res?.error) {
                 Swal.fire('Error Deleting Vendor', '', 'error')
             } else {

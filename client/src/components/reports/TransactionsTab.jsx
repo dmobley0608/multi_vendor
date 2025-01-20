@@ -60,7 +60,7 @@ const TransactionsTab = () => {
   };
 
   const handlePrintInvoice = (id) => {
-    window.open(`/print-invoice/${id}`, id, "width=800,height=500");
+    window.open(`print-invoice/${id}/?sidebar=false`, id, "width=800,height=500");
   };
 
   const handleRowClick = (transaction) => {

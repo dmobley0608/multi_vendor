@@ -66,10 +66,10 @@ export default function CashRegister() {
       grand_total: (parseFloat(subTotal + salesTax + cardFee) * 100).toFixed(0),
       payment_method: paymentMethod,
     };
-    console.log(transactionDetails)
+
     try {
       const response = await createTransaction(transactionDetails).unwrap();
-      console.log(response)
+
       if (response) {
         const { isConfirmed } = await Swal.fire({
           title: "Success",
@@ -80,7 +80,7 @@ export default function CashRegister() {
         });
 
         if (isConfirmed) {
-          window.open(`/print-invoice/${response.id}`, response.id, "width=800,height=500");
+          window.open(`print-invoice/${response.id}/?sidebar=false`, response.id, "width=800,height=500");
           window.location.reload();
         }
 

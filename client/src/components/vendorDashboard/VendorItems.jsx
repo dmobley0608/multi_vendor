@@ -46,10 +46,10 @@ export default function VendorItems() {
     try {
       if (isEditing) {
         const res = await updateVendorItem({ itemId: selectedItem.id, ...formData, price: formData.price * 100, vendor: vendorData.id }).unwrap()
-        console.log(res)
+
       } else {
         const res = await addVendorItem({ ...formData, price: formData.price * 100, vendor: vendorData.id }).unwrap()
-        console.log(res)
+       
       }
       setShowModal(false)
     } catch (err) {

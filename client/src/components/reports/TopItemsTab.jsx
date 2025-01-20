@@ -8,7 +8,7 @@ const TopItemsTab = () => {
   const [activeKey, setActiveKey] = useState('week');
 
   useEffect(() => {
-    console.log('items', topItems);
+   
   }, [topItems]);
 
   const renderTable = (items, title) => (

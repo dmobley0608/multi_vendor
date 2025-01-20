@@ -61,7 +61,7 @@ export default function UserProfile() {
     try {
 
       if (vendorData) {
-        console.log('Vendor', vendorFormData)
+
         let body = {
           id: vendorData.id,
           items:[],
@@ -72,14 +72,14 @@ export default function UserProfile() {
           },
           ...vendorFormData }
         let res = await updateVendor(body);
-        console.log(res)
+
         if(res.error){
           Swal.fire('Error', 'Failed to update information', 'error');
           return
         }
       }else{
         const res = await updateUser({ id: user.id, ...formData });
-        console.log(res)
+
         if(res.error){
           Swal.fire('Error', 'Failed to update information', 'error');
           return
@@ -100,7 +100,7 @@ export default function UserProfile() {
     }
     try {
       const res = await updateUser({ id: user.id, name:user.name,  password: formData.new_password });
-        console.log(res)
+      
         if(res.error){
             Swal.fire('Error', 'Failed to update password', 'error');
             return

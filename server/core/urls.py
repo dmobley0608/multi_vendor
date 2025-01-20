@@ -37,8 +37,8 @@ urlpatterns = [
     path('api/user/', include('user.urls')),
     path('api/', include('vendor.urls')),
     path('api/', include('transaction.urls')),
-    path('api/', include('message.urls')),  
-    re_path(r'^(?!api|admin).*$', RedirectView.as_view(url='/', permanent=False)),
+    path('api/', include('message.urls')),
+    re_path(r'^(?!api|admin).*$', views.homepage,name='index'),
 
 
 ]

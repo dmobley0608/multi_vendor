@@ -8,7 +8,7 @@ const TopVendorsTab = () => {
   const [activeKey, setActiveKey] = useState('week');
 
   useEffect(() => {
-    console.log('vendors', topVendors);
+  
   }, [topVendors]);
 
   const renderTable = (vendors, title) => (

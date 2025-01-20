@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import Inbox from '../messages/Inbox';
 import Outbox from '../messages/Outbox';
 import { useGetUserQuery } from '../../services/Api';
+import UnreadMessageBadge from '../messages/UnreadMessageBadge';
 
 export default function Messages() {
   const { data: messages, isLoading: isMessagesLoading } = useGetMessagesQuery();
@@ -75,13 +76,13 @@ export default function Messages() {
       if (user.is_staff) {
         for (const recipient_id of newMessage.recipient_ids) {
           const res = await createMessage({ ...newMessage, recipient_ids: [recipient_id] });
-          console.log(res)
+
           if (res.data) {
-            console.log(res)
+
             count++;
           }
           if (res.error) {
-            console.log(res.error)
+
             errorCount++;
           }
         }
@@ -106,7 +107,7 @@ export default function Messages() {
 
       handleCloseModal();
     } catch (error) {
-      console.log(error)
+    
       Swal.fire('Error', 'Failed to send message', 'error');
     }
   };
@@ -149,7 +150,7 @@ export default function Messages() {
 
   const inboxMessages = messages?.results?.filter((msg) => msg.recipients.some(recipient => recipient.id === user.id));
   const outboxMessages = messages?.results?.filter((msg) => msg.sender === user.id);
-  const unreadMessagesCount = inboxMessages?.filter((msg) => !msg.is_read).length;
+
 
   return (
     <Container className='p-3'>
@@ -163,7 +164,7 @@ export default function Messages() {
       <Row className='mt-3'>
         <Col>
           <Tabs defaultActiveKey="inbox" id="messages-tabs">
-            <Tab eventKey="inbox" title={<><FaInbox /> Inbox <Badge bg="secondary">{unreadMessagesCount}</Badge></>}>
+            <Tab eventKey="inbox" title={<><FaInbox /> Inbox <UnreadMessageBadge/></>}>
               <Inbox messages={inboxMessages} onView={(msg) => handleShowViewModal(msg, true)} onReply={handleReply} user={user} onDelete={handleDelete} />
             </Tab>
             <Tab eventKey="outbox" title={<><FaPaperPlane /> Outbox</>}>

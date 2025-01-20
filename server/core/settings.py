@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-pmq4zwv$1ditojh-avr=1c+z$jkoqjo^1c9=+)87dqn@6l=3d)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['hu.tccs.tech', 'localhost']
 
 
 
@@ -69,7 +69,8 @@ ROOT_URLCONF = 'core.urls'
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "http://localhost:8000"
+    "http://localhost:8000",
+    "https://hu.tccs.tech"
     # Add other allowed origins here
 ]
 CORS_ALLOW_HEADERS = [

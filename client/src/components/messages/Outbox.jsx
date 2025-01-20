@@ -24,7 +24,7 @@ const Outbox = ({ messages, onView, onDelete, user }) => {
                 <td>{msg?.recipients?.map((recipient) => recipient.email).join(', ') || 'All Vendors'}</td>
                 <td>{msg.subject}</td>
                 <td>{new Date(msg.timestamp).toLocaleString()}</td>
-                <td>{msg.is_read ? 'Read' : 'Unread'}</td>
+                <td>{msg.is_read  ? 'Read' : 'Unread'}</td>
                 <td>
                   <Button variant="" size="sm" onClick={(e) => { e.stopPropagation(); onView(msg); }} style={{ backgroundColor: 'transparent' }}>
                     <FaEye />

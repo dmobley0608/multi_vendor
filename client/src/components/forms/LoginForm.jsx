@@ -17,8 +17,12 @@ function LoginForm() {
     const res = await triggerLogin(credentials)
     if (res?.data) {
       localStorage.setItem('token', res.data.token)
-      await checkUser()
-      nav('/')
+      let user = await checkUser().unwrap()
+           if(user && user.is_staff){
+        nav('/staff/cash-register')
+      }else{
+        nav('/vendor')
+      }
     }
     if (res?.error) {
       setError("Invalid Credentials")
@@ -31,7 +35,7 @@ function LoginForm() {
       <small className='text-danger'>{error}</small>
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Email address</Form.Label>
-        <Form.Control type="email" placeholder="Enter email" onChange={({ target }) => setCredentials({ ...credentials, email: target.value })} />
+        <Form.Control type="email" autoComplete='email' placeholder="Enter email" onChange={({ target }) => setCredentials({ ...credentials, email: target.value })} />
         <Form.Text className="text-muted">
           We'll never share your email with anyone else.
         </Form.Text>

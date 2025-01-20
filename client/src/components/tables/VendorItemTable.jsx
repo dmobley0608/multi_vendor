@@ -32,7 +32,7 @@ const VendorItemTable = ({ items, vendor }) => {
         })
         if (isConfirmed) {
             const res = await deleteItem(id)
-            console.log(res)
+          
             if (res?.error) {
                 Swal.fire('Error Deleting Item', '', 'error')
             } else {

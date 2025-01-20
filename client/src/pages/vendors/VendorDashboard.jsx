@@ -10,6 +10,7 @@ import VendorMessages from '../../components/vendorDashboard/VendorMessages'
 import VendorPayments from '../../components/vendorDashboard/VendorPayments'
 import { useNavigate } from 'react-router'
 import UserProfile from '../UserProfile'; // Import UserProfile component
+import UnreadMessageBadge from '../../components/messages/UnreadMessageBadge'
 
 export default function VendorDashboard() {
   const { data: vendorData } = useGetVendorByUserQuery()
@@ -31,7 +32,7 @@ export default function VendorDashboard() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    console.log('Vendor data:', vendorData)
+
     if (vendorData) {
       setFormData({
         store_name: vendorData.store_name || '',
@@ -72,7 +73,7 @@ export default function VendorDashboard() {
     e.preventDefault()
     updateVendor({ id: vendorData.id, ...formData })
     setShowModal(false)
-    console.log('Form data:', formData)
+
   }
 
   const handleSignOut = () => {
@@ -82,7 +83,7 @@ export default function VendorDashboard() {
 
   if (!vendorData) return null
 
-  const unreadMessagesCount = messages?.results?.filter((msg) => !msg.is_read).length;
+
 
   return (
     <Container className=''>
@@ -98,7 +99,7 @@ export default function VendorDashboard() {
             </Col>
             <Col md={4} className="d-flex flex-column justify-content-center align-items-center">
               <h6 className='text-danger'>Balance: ${(vendorData.balance/100).toFixed(2)}</h6>
-              <h6 className='text-success'>YTD: ${(vendorData?.ytd_sales/100 ?? 0).toFixed(2)}</h6>
+              <h6 className='text-success'>YTD: ${(vendorData?.ytd_sales/100).toFixed(2)}</h6>
             </Col>
             <Col md={12}>
               <VendorItems />
@@ -107,7 +108,7 @@ export default function VendorDashboard() {
 
           </Row>
         </Tab>
-        <Tab eventKey="messages" title={<><FaInbox /> Messages <Badge bg="secondary">{unreadMessagesCount}</Badge></>}>
+        <Tab eventKey="messages" title={<><FaInbox /> Messages <UnreadMessageBadge/></>}>
           <VendorMessages />
         </Tab>
         <Tab eventKey="profile" title="Profile">

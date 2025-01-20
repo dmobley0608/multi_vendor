@@ -16,6 +16,19 @@ import Messages from './components/vendorDashboard/VendorMessages.jsx'
 import Reports from './pages/staff/reports/Reports.jsx'
 import MonthlyReport from './components/reports/MonthlyReport.jsx'
 import UserProfile from './pages/UserProfile.jsx'
+import { ErrorBoundary } from 'react-error-boundary'
+import { Button } from 'react-bootstrap'
+
+function ErrorFallback({ error }) {
+  const nav = useNavigate()
+  useEffect(() => {console.log(error)}, [error])
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <Button onClick={()=>nav('/')}>Return Home</Button>
+    </div>
+  )
+}
 
 function App() {
   const { data: user, isLoading, error } = useGetUserQuery()
@@ -30,28 +43,38 @@ function App() {
      }
   }
 
+  useEffect(() => {
+    if(error){
+      console.log(error)
+    }
+
+  }, [error])
+
+
   return (
     <>
 
       {isLoading ? "Loading" :
       <>
       {error?.status === 'FETCH_ERROR' && <small className='text-danger'>Looks like there is an issue with the server. Please try again later.</small>}
-        <Routes>
-          <Route path='/' element={<Homepage user={user}/>}/>
-            <Route path='staff' element={<EmployeeAuth><StaffDashboard /></EmployeeAuth>}>
-              <Route index path='cash-register' element={<CashRegister />} />
-              <Route path='vendors' element={<Vendors />} />
-              <Route path='vendors/:id' element={<VendorDetails/>}/>
-              <Route path='messages' element={<Messages/>}/>
-              <Route path='reports' element={<Reports/>}/>
-              <Route path='monthly-report' element={<MonthlyReport />} />
-              <Route path='profile' element={<UserProfile />} />
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Routes>
+            <Route path='/' element={<Login/>}/>
+              <Route path='staff' element={<EmployeeAuth><StaffDashboard /></EmployeeAuth>}>
+                <Route index path='cash-register' element={<CashRegister />} />
+                <Route path='vendors' element={<Vendors />} />
+                <Route path='vendors/:id' element={<VendorDetails/>}/>
+                <Route path='messages' element={<Messages/>}/>
+                <Route path='reports' element={<Reports/>}/>
+                <Route path='monthly-report' element={<MonthlyReport />} />
+                <Route path='profile' element={<UserProfile />} />
+                <Route path='print-invoice/:id' element={<PrintInvoice />} />
+              </Route>
+              <Route path='/vendor' element={<VendorDashboard />} />
+              <Route path='login' element={<Login />} />
 
-            </Route>
-            <Route path='/vendor' element={<VendorDashboard />} />
-            <Route path='login' element={<Login />} />
-            <Route path='/print-invoice/:id' element={<PrintInvoice />} />
-        </Routes>
+          </Routes>
+        </ErrorBoundary>
         </>
       }
     </>

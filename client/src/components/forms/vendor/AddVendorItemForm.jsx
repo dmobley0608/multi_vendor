@@ -15,7 +15,7 @@ export default function AddVendorItemForm({ vendor, vendorItem }) {
         let res = null
         if (vendorItem) {
             formData = {...formData, itemId:vendorItem.id}
-            console.log(formData)
+           
             res = await updateItem({ ...formData })
         } else {
             res = await addItem({ ...formData })

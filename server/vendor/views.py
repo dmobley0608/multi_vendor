@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from .models import Vendor, VendorItem, VendorPayment
 from transaction.models import TransactionItem
 from .serializers import VendorSerializer, VendorItemSerializer, VendorUpdateSerializer, VendorPaymentSerializer
+from django.db.models import Sum
 
 class VendorViewSet(viewsets.ModelViewSet):
     serializer_class = VendorSerializer
