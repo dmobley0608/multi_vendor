@@ -6,10 +6,11 @@ import Swal from 'sweetalert2'
 export default function AddVendorPaymentForm({ vendor }) {
     const [data, setData] = useState({amount:parseFloat(0.00).toFixed(2)})
     const [addPayment] = useAddVendorPaymentMutation()
-
+    const [isLoading, setIsLoading] = useState(false);
 
     const onSubmit = async (e) => {
         e.preventDefault()
+        setIsLoading(true);
         let body = { vendor: vendor.id, amount: parseFloat(data.amount).toFixed(2) * 100 }
         const res = await addPayment(body)
 
@@ -33,6 +34,7 @@ export default function AddVendorPaymentForm({ vendor }) {
                 confirmButtonText: 'OK'
             })
         }
+        setIsLoading(false);
     }
 
     useEffect(() => { }, [vendor, data])
@@ -42,12 +44,23 @@ export default function AddVendorPaymentForm({ vendor }) {
             <h6>Add Payment to {vendor?.store_name ? vendor.store_name : vendor?.user?.name}</h6>
             <FloatingLabel>
                 <FloatingLabel controlId="floatingInput" label="Amount" className="mb-3" >
-                    <Form.Control type="number" step={.01} placeholder="0.00" name='amount' value={data.amount} onChange={({ target }) => setData({ ...data, amount: target.value })} required />
+                    <Form.Control
+                    type="number"
+                    step={.01}
+                    placeholder="0.00"
+                    name='amount'
+                    value={data.amount}
+                    onFocus={({target})=>target.value = ''}
+                    onChange={({ target }) => setData({ ...data, amount: target.value })}
+                    onBlur={({target})=>target.value = data.amount}
+                    required />
                 </FloatingLabel>
             </FloatingLabel>
             <Row>
                 <Col sm={12}>
-                    <Button variant='success' type='submit' className='w-100'>Add Payment</Button>
+                    <Button variant='success' type='submit' className='w-100' disabled={isLoading}>
+                        {isLoading ? 'Adding Payment...' : 'Add Payment'}
+                    </Button>
                 </Col>
             </Row>
 

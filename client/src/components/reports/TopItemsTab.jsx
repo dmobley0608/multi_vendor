@@ -8,12 +8,12 @@ const TopItemsTab = () => {
   const [activeKey, setActiveKey] = useState('week');
 
   useEffect(() => {
-   
+
   }, [topItems]);
 
   const renderTable = (items, title) => (
     <div>
-      <h4>{title}</h4>
+      
       <Table striped bordered hover>
         <thead>
           <tr>

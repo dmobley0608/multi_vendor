@@ -8,12 +8,12 @@ const TopVendorsTab = () => {
   const [activeKey, setActiveKey] = useState('week');
 
   useEffect(() => {
-  
+
   }, [topVendors]);
 
   const renderTable = (vendors, title) => (
     <div>
-      <h4>{title}</h4>
+     
       <Table striped bordered hover>
         <thead>
           <tr>

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLazyGetTransactionsQuery } from '../../services/TransactionApi';
 import { useGetVendorItemsQuery } from '../../services/Api';
-import { Form, Button, Table, Collapse, Row, Col, Modal } from 'react-bootstrap';
+import { Form, Button, Table, Collapse, Row, Col, Modal, Pagination } from 'react-bootstrap';
 import { FaPrint, FaFilter } from 'react-icons/fa';
-
 
 const TransactionsTab = () => {
   const [item, setItem] = useState('');
@@ -15,6 +14,8 @@ const TransactionsTab = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     trigger();
@@ -37,10 +38,9 @@ const TransactionsTab = () => {
     }
 
     if (dateRange.start) {
-      filtered = filtered.filter((transaction) =>{
-        return new Date(transaction.date) >= new Date(dateRange.start)
-      }
-      );
+      filtered = filtered.filter((transaction) => {
+        return new Date(transaction.date) >= new Date(dateRange.start);
+      });
     }
 
     if (dateRange.end) {
@@ -73,6 +73,12 @@ const TransactionsTab = () => {
     setSelectedTransaction(null);
   };
 
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const paginatedTransactions = filteredTransactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   return (
     <div>
       <Button
@@ -94,7 +100,7 @@ const TransactionsTab = () => {
                   <Form.Label>Item</Form.Label>
                   <Form.Control as="select" value={item} onChange={(e) => setItem(e.target.value)}>
                     <option value="">Select Item</option>
-                    {vendorItems?.results?.map((vendorItem) => (
+                    {vendorItems?.map((vendorItem) => (
                       <option key={vendorItem.id} value={vendorItem.id}>
                         {vendorItem.name}
                       </option>
@@ -103,7 +109,7 @@ const TransactionsTab = () => {
                 </Form.Group>
               </Col>
             </Row>
-            <Row>
+            <Row className='justify-content-start'>
               <Col md={6}>
                 <Form.Group controlId="dateRangeStart">
                   <Form.Label>Start Date</Form.Label>
@@ -116,46 +122,63 @@ const TransactionsTab = () => {
                   <Form.Control type="date" value={dateRange.end} onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })} />
                 </Form.Group>
               </Col>
+              <Col md={3}>
+                <Button type="submit" variant='primary'  className='w-100 my-3'>Filter</Button>
+              </Col>
             </Row>
-            <Button type="submit" variant='link' style={{ backgroundColor: 'transparent' }}>Filter</Button>
+
           </Form>
         </div>
       </Collapse>
       {isLoading && <p>Loading...</p>}
       {error && <p>Error loading transactions</p>}
       {Array.isArray(filteredTransactions) && (
-        <Table striped bordered hover size="sm">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Date</th>
-              <th>Payment Method</th>
-              <th>Sub Total</th>
-              <th>Sales Tax</th>
-              <th>Card Fee</th>
-              <th>Grand Total</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredTransactions.map((transaction) => (
-              <tr key={transaction.id} style={{ fontSize: '0.875rem', fontWeight: 'normal', cursor: 'pointer' }} onClick={() => handleRowClick(transaction)}>
-                <td>{transaction.id}</td>
-                <td>{formatDateTime(transaction.date)}</td>
-                <td>{transaction.payment_method}</td>
-                <td>${transaction?.sub_total / 100}</td>
-                <td>${transaction?.sales_tax / 100}</td>
-                <td>${transaction?.card_fee > 0 ? transaction.card_fee / 100 : '0.00'}</td>
-                <td>${transaction?.grand_total / 100}</td>
-                <td>
-                  <Button variant="link" style={{ backgroundColor: 'transparent' }} onClick={(e) => { e.stopPropagation(); handlePrintInvoice(transaction.id); }}>
-                    <FaPrint />
-                  </Button>
-                </td>
+        <>
+          <p className='fw-bold text-dark'>Total Transactions: {filteredTransactions.length}</p>
+          <Table striped bordered hover size="sm">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Payment Method</th>
+                <th>Sub Total</th>
+                <th>Sales Tax</th>
+                <th>Card Fee</th>
+                <th>Grand Total</th>
+                <th>Actions</th>
               </tr>
+            </thead>
+            <tbody>
+              {paginatedTransactions.map((transaction) => (
+                <tr key={transaction.id} style={{ fontSize: '0.875rem', fontWeight: 'normal', cursor: 'pointer' }} onClick={() => handleRowClick(transaction)}>
+                  <td>{transaction.id}</td>
+                  <td>{formatDateTime(transaction.date)}</td>
+                  <td>{transaction.payment_method}</td>
+                  <td>${transaction?.sub_total / 100}</td>
+                  <td>${transaction?.sales_tax / 100}</td>
+                  <td>${transaction?.card_fee > 0 ? transaction.card_fee / 100 : '0.00'}</td>
+                  <td>${transaction?.grand_total / 100}</td>
+                  <td>
+                    <Button variant="" style={{ backgroundColor: 'transparent' }} onClick={(e) => { e.stopPropagation(); handlePrintInvoice(transaction.id); }}>
+                      <FaPrint />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <Pagination>
+            {Array.from({ length: Math.ceil(filteredTransactions.length / itemsPerPage) }, (_, index) => (
+              <Pagination.Item
+                key={index + 1}
+                active={index + 1 === currentPage}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </Pagination.Item>
             ))}
-          </tbody>
-        </Table>
+          </Pagination>
+        </>
       )}
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>

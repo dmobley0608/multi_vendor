@@ -1,5 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+const apiBaseUrl = 'https://hu.tccs.tech/api/'
+
 const getTokenKey = () => {
   if (!localStorage.getItem('token')) {
     return null;
@@ -7,12 +9,31 @@ const getTokenKey = () => {
   return localStorage.getItem('token');
 };
 
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
 const baseQuery = fetchBaseQuery({
-  baseUrl: `${import.meta.env.VITE_API_URL}/`,
+  baseUrl: apiBaseUrl,
   prepareHeaders: (headers, { getState }) => {
     const token = getTokenKey();
     if (token) {
       headers.set('Authorization', `Token ${token}`);
+    }
+    const csrfToken = getCookie('csrftoken');
+    if (csrfToken) {
+      headers.set('X-CSRFToken', csrfToken)
     }
     return headers;
   },
@@ -39,21 +60,21 @@ export const transactionApi = createApi({
     }),
     createTransaction: builder.mutation({
       query: (transaction) => ({
-        url: '/transactions/',
+        url: 'transactions/',
         method: 'POST',
         body: transaction,
       }),
     }),
     updateTransaction: builder.mutation({
       query: ({ id, ...transaction }) => ({
-        url: `/transactions/${id}`,
+        url: `transactions/${id}`,
         method: 'PUT',
         body: transaction,
       }),
     }),
     deleteTransaction: builder.mutation({
       query: (id) => ({
-        url: `/transactions/${id}`,
+        url: `transactions/${id}`,
         method: 'DELETE',
       }),
     }),

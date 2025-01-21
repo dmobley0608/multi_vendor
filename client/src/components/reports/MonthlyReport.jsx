@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLazyGetTransactionsQuery } from '../../services/TransactionApi';
 import { useGetVendorsQuery } from '../../services/Api';
-import { Table, Button } from 'react-bootstrap';
+import { Table, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 const MonthlyReport = () => {
   const [trigger, { data: transactions, error, isLoading }] = useLazyGetTransactionsQuery();
@@ -28,8 +28,8 @@ const MonthlyReport = () => {
       const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
 
       const vendorData = vendors.results.reduce((acc, vendor) => {
-        const vendorName = vendor.store_name || vendor.user.name;
-        acc[vendorName] = {
+        acc[vendor.id] = {
+          vendorName: vendor.store_name || vendor.user.name,
           totalItemsSold: 0,
           totalAmount: 0,
           totalVendorFees: 0,
@@ -38,28 +38,37 @@ const MonthlyReport = () => {
             const paymentDate = new Date(payment.date);
             return paymentDate >= new Date(firstDayOfMonth) && paymentDate <= new Date(lastDayOfMonth);
           }).length || 0,
+          payments:vendor.payments.filter(payment => {
+            const paymentDate = new Date(payment.date);
+            return paymentDate >= new Date(firstDayOfMonth) && paymentDate <= new Date(lastDayOfMonth);
+          }),
         };
         return acc;
       }, {});
 
       transactions.results.forEach((transaction) => {
         transaction.items.forEach((item) => {
-          if (vendorData[item.sold_by]) {
-            vendorData[item.sold_by].totalItemsSold += item.quantity;
-            vendorData[item.sold_by].totalAmount += item.total;
-            vendorData[item.sold_by].totalVendorFees += item.vendor_fee;
+          let items = vendors.results.reduce((acc=[], vendor)=>[...acc, ...vendor?.items], [])
+          const vendor_item = items?.filter(i => i.id == item.vendor_item)[0]
+          if (vendor_item && vendorData[vendor_item?.vendor]) {
+            console.log(vendorData)
+            vendorData[vendor_item.vendor].totalItemsSold += item.quantity;
+            vendorData[vendor_item.vendor].totalAmount += item.total;
+            vendorData[vendor_item.vendor].totalVendorFees += item.vendor_fee;
           }
         });
       });
 
+
       const sortedReportData = Object.entries(vendorData)
-        .map(([vendor, data]) => ({
-          vendor,
+        .map(([vendorId, data]) => ({
+          vendorId,
           ...data,
         }))
-        .sort((a, b) => a.vendor.localeCompare(b.vendor));
+        .sort((a, b) => a.vendorName.localeCompare(b.vendorName));
 
       setReportData(sortedReportData);
+
     }
   }, [transactions, vendors]);
 
@@ -76,9 +85,21 @@ const MonthlyReport = () => {
     return `$${(amount / 100).toFixed(2)}`;
   };
 
+  const renderTooltip = (payments) => {
+    console.log(payments)
+    return(
+    <Tooltip>
+      <ul className="list-unstyled mb-0">
+        {payments?.map((payment, index) => (
+          <li key={index}>{new Date(payment.date).toLocaleDateString()}: {formatCurrency(payment.amount)}</li>
+        ))}
+      </ul>
+    </Tooltip>
+  )};
+
   return (
     <div>
-      <h2>Monthly Report</h2>
+
       {isLoading && <p>Loading...</p>}
       {error && <p>Error loading transactions</p>}
       {reportData.length > 0 && (
@@ -95,13 +116,18 @@ const MonthlyReport = () => {
               </tr>
             </thead>
             <tbody>
-              {reportData.map((data, index) => (
+              {reportData?.map((data, index) => (
                 <tr key={index}>
-                  <td>{data.vendor}</td>
+                  <td>{data.vendorName}</td>
                   <td>{data.totalItemsSold}</td>
                   <td>{formatCurrency(data.totalAmount)}</td>
                   <td>{formatCurrency(data.totalVendorFees)}</td>
-                  <td>${data.totalPayments > 0 ? data.totalPayments.toFixed(2) : '0.00'}</td>
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={renderTooltip(data?.payments)}
+                  >
+                    <td>{data.totalPayments}</td>
+                  </OverlayTrigger>
                   <td>{formatCurrency(data.balance)}</td>
                 </tr>
               ))}

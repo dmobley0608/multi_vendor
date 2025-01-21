@@ -29,6 +29,10 @@ COPY ./client/package*.json ./
 # Copy the rest of the client code into the container
 COPY ./client .
 
+# Set environment variables for Vite app
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=https://hu.tccs.tech/api
+
 # Install client dependencies
 RUN npm install
 

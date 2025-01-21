@@ -45,6 +45,7 @@ class VendorSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
 
         nested_user = validated_data.pop('user')
+     
         item = validated_data.pop('items', [])
         payments = validated_data.pop('payments', [])
 

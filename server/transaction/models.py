@@ -46,6 +46,12 @@ class TransactionItem(models.Model):
 
     def save(self, *args, **kwargs):
         self.calculate_total()
-        self.sold_by = self.vendor_item.vendor.store_name or self.vendor_item.vendor.user.name
-        self.name = self.vendor_item.name
+        if self.vendor_item and self.vendor_item.vendor:
+            self.sold_by = self.vendor_item.vendor.store_name or self.vendor_item.vendor.user.name
+        else:
+            self.sold_by = 'Unknown'
+        if self.vendor_item:
+            self.name = self.vendor_item.name
+        else:
+            self.name = 'Unknown'
         super().save(*args, **kwargs)

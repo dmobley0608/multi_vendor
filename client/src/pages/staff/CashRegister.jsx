@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useGetVendorsQuery } from '../../services/Api';
 import { useCreateTransactionMutation } from '../../services/TransactionApi';
 import { Form, Button, Container, Row, Col, ListGroup, Spinner, Table, Modal } from 'react-bootstrap';
-import { FaShoppingCart, FaCog } from 'react-icons/fa';
+import { FaShoppingCart, FaCog, FaCaretDown } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import './CashRegister.styles.css';
-
 
 export default function CashRegister() {
   const [items, setItems] = useState([]);
@@ -21,11 +20,26 @@ export default function CashRegister() {
   const [createTransaction] = useCreateTransactionMutation();
 
   const addItem = (item) => {
+    const existingItem = items.find(i => i.vendor_item === item.id);
+    if (existingItem) {
+      Swal.fire("Error", "Item already added. Please update the quantity via the table.", "error");
+      return;
+    }
     const itemTotal = item.price * quantity;
-    setItems([...items, { ...item, quantity, vendor_item: item.id, total: itemTotal }]);
+    setItems([...items,
+      {
+        name:item.name,
+        price:item.price,
+        quantity,
+        vendor_item: item.id,
+        total: itemTotal,
+        sold_by:item.vendor.store_name || item.vendor.user.name
+      }]);
     setTotal(total + itemTotal);
     setQuantity(1);
     setSelectedItem(null);
+    setSelectedVendor(null);
+    console.log(items)
   };
 
   const handleVendorChange = (e) => {
@@ -36,7 +50,8 @@ export default function CashRegister() {
 
   const handleItemChange = (e) => {
     const item = selectedVendor.items.find(i => i.name === e.target.value);
-    setSelectedItem(item);
+   const {name, store_name,id} = selectedVendor
+    setSelectedItem({...item, vendor:{name, store_name,id}});
   };
 
   const handleQuantityChange = (index, newQuantity) => {
@@ -59,10 +74,12 @@ export default function CashRegister() {
   };
 
   const handleCheckout = async () => {
+    console.log(items)
     const transactionDetails = {
       items: items.map(item => ({ ...item, total: item.quantity * item.price })),
       sub_total: (subTotal * 100).toFixed(0),
       sales_tax: (salesTax * 100).toFixed(0),
+      card_fee: (cardFee * 100).toFixed(0),
       grand_total: (parseFloat(subTotal + salesTax + cardFee) * 100).toFixed(0),
       payment_method: paymentMethod,
     };
@@ -81,9 +98,9 @@ export default function CashRegister() {
 
         if (isConfirmed) {
           window.open(`print-invoice/${response.id}/?sidebar=false`, response.id, "width=800,height=500");
-          window.location.reload();
-        }
 
+        }
+        window.location.reload();
       } else {
         Swal.fire("Error", "Transaction failed. Please try again.", "error");
       }
@@ -121,7 +138,7 @@ export default function CashRegister() {
             <Col md="auto">
               <Form.Group controlId="vendorSelect">
                 <Form.Label>Select Vendor</Form.Label>
-                <Form.Control as="select" onChange={handleVendorChange} required>
+                <Form.Control as="select" onChange={handleVendorChange} value={selectedVendor?.id || ''} required>
                   <option value="">Select Vendor</option>
                   {vendors?.results?.map(vendor => (
                     <option key={vendor.id} value={vendor.id}>
@@ -134,7 +151,7 @@ export default function CashRegister() {
             <Col md="auto">
               <Form.Group controlId="itemSelect">
                 <Form.Label>Select Item</Form.Label>
-                <Form.Control as="select" onChange={handleItemChange} required>
+                <Form.Control as="select" onChange={handleItemChange} value={selectedItem?.name || ''} required>
                   <option value="">Select Item</option>
                   {selectedVendor?.items?.map((item, index) => (
                     <option key={index} value={item.name}>
@@ -178,14 +195,16 @@ export default function CashRegister() {
             <tbody>
               {items.map((item, index) => (
                 <tr key={index}>
-                  <td>{item.vendor.store_name || selectedVendor.user.name}</td>
+                  <td>{item?.sold_by}</td>
                   <td>{item.name}</td>
                   <td style={{ width: '100px' }}>
                     <Form.Control
                       type="number"
                       min="1"
                       value={item.quantity}
+                      onFocus={(e) => e.target.value=''}
                       onChange={(e) => handleQuantityChange(index, parseInt(e.target.value))}
+                      onBlur={(e)=>{if(!e.target.value) e.target.value=item.quantity}}
                       required
                     />
                   </td>
@@ -210,10 +229,14 @@ export default function CashRegister() {
               <tr>
                 <td colSpan="4" className="text-end fw-bold">Payment Method</td>
                 <td>
-                  <Form.Control as="select" value={paymentMethod} onChange={handlePaymentMethodChange}>
-                    <option value="CASH">CASH</option>
-                    <option value="CARD">CARD</option>
-                  </Form.Control>
+                  <div className="d-flex  align-items-center">
+
+                    <Form.Control id='paymentMethod' as="select" value={paymentMethod} onChange={handlePaymentMethodChange}>
+                      <option value="CASH">CASH</option>
+                      <option value="CARD">CARD</option>
+                    </Form.Control>
+                    <Form.Label htmlFor='paymentMethod' className="p-0 bg-white"><FaCaretDown className='no-print' style={{marginLeft:'-25px'}}/></Form.Label>
+                  </div>
                 </td>
               </tr>
               <tr>

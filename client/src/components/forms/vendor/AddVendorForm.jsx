@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react'
 import { Col, FloatingLabel, Form, Row, Button, Spinner } from 'react-bootstrap'
 import { useAddVendorMutation, useUpdateVendorMutation } from '../../../services/Api'
@@ -51,7 +50,7 @@ export default function AddVendorForm({ vendor }) {
         } else {
             res = await addVendor({
                 ...data,
-                user: { email: data.email, password: data.password, name: data.name },
+                user: { email: data.email, password: data.password, name: data.name, phone_number:data.phone_number },
                 items: [],
                 payments:[]
             })
@@ -106,50 +105,50 @@ export default function AddVendorForm({ vendor }) {
             {data &&
                 <Form onSubmit={onSubmit}>
                     <h6>User Info</h6>
-                    <FloatingLabel controlId="floatingInput" label="Name" className="mb-3" >
+                    <FloatingLabel controlId="floatingInputName" label="Name" className="mb-3" >
                         <Form.Control type="text" placeholder="John Doe" name='name' value={data.name}
                             onChange={({ target }) => setData({ ...data, name: target.value })} required />
                     </FloatingLabel>
-                    <FloatingLabel controlId='floatingInput' label='Email' className='mb-3'>
+                    <FloatingLabel controlId='floatingInputEmail' label='Email' className='mb-3'>
                         <Form.Control type='email' placeholder='jd@example.com' name='email' value={data.email}
                             onChange={({ target }) => setData({ ...data, email: target.value })} required />
                     </FloatingLabel>
-                    <FloatingLabel controlId='floatingInput' label='Phone Number (Optional)' className='mb-3'>
+                    <FloatingLabel controlId='floatingInputPhoneNumber' label='Phone Number (Optional)' className='mb-3'>
                         <Form.Control type='text' placeholder='555 555 5555' name='phone_number' value={data.phone_number}
                             onChange={({ target }) => setData({ ...data, phone_number: target.value })} />
                     </FloatingLabel>
                     <h6>Store Info</h6>
                     <Row>
                         <Col sm={12} md={6}>
-                            <FloatingLabel controlId="floatingInput" label="Vendor Id" className='mb-3'>
+                            <FloatingLabel controlId="floatingInputVendorId" label="Vendor Id" className='mb-3'>
                                 <Form.Control type="number" placeholder="5175" name='id' value={data.id}
-                                    onChange={({ target }) => setData({ ...data, id: target.value })} />
+                                    onChange={({ target }) => setData({ ...data, id: target.value })} readOnly={vendor?.id ? true : false} />
                             </FloatingLabel>
                         </Col>
                     </Row>
-                    <FloatingLabel controlId="floatingInput" label="Store Name" className='mb-3'>
+                    <FloatingLabel controlId="floatingInputStoreName" label="Store Name" className='mb-3'>
                         <Form.Control type="text" placeholder="The Item Shop" name='store_name' value={data.store_name}
                             onChange={({ target }) => setData({ ...data, store_name: target.value })} />
                     </FloatingLabel>
-                    <FloatingLabel controlId="floatingInput" label="Street Address" className='mb-3'>
+                    <FloatingLabel controlId="floatingInputStreetAddress" label="Street Address" className='mb-3'>
                         <Form.Control type="text" placeholder="123 Example Street" name='street_address' value={data.street_address}
                             onChange={({ target }) => setData({ ...data, street_address: target.value })} />
                     </FloatingLabel>
                     <Row>
                         <Col sm={12} md={5}>
-                            <FloatingLabel controlId="floatingInput" label="City" className='mb-3'>
+                            <FloatingLabel controlId="floatingInputCity" label="City" className='mb-3'>
                                 <Form.Control type="text" placeholder="Helen" name='city' value={data.city}
                                     onChange={({ target }) => setData({ ...data, city: target.value })} />
                             </FloatingLabel>
                         </Col>
                         <Col sm={12} md={2}>
-                            <FloatingLabel controlId="floatingInput" label="State" className='mb-3'>
+                            <FloatingLabel controlId="floatingInputState" label="State" className='mb-3'>
                                 <Form.Control type="text" placeholder="Ga" name='state' value={data.state}
                                     onChange={({ target }) => setData({ ...data, state: target.value })} />
                             </FloatingLabel>
                         </Col>
                         <Col sm={12} md={5}>
-                            <FloatingLabel controlId="floatingInput" label="Postal Code" className='mb-3'>
+                            <FloatingLabel controlId="floatingInputPostalCode" label="Postal Code" className='mb-3'>
                                 <Form.Control type="text" placeholder="30543" name='postal_code' value={data.postal_code}
                                     onChange={({ target }) => setData({ ...data, postal_code: target.value })} />
                             </FloatingLabel>
@@ -159,13 +158,13 @@ export default function AddVendorForm({ vendor }) {
                         <Row>
                             <Col sm={12}>
                                 <small className='text-danger'>Please make a note of this to send to the vendor. They will change thier password once they login.</small>
-                                <FloatingLabel controlId="floatingInput" label="Password" className='mb-3'>
+                                <FloatingLabel controlId="floatingInputPassword" label="Password" className='mb-3'>
                                     <Form.Control type="text" placeholder="password" name='password' value={data.password} disabled />
                                 </FloatingLabel>
                             </Col>
                         </Row>
                         :
-                        <FloatingLabel controlId="floatingInput" label="Balance" className='mb-3'>
+                        <FloatingLabel controlId="floatingInputBalance" label="Balance" className='mb-3'>
                             <Form.Control type="number" step={.01} placeholder="0.00" name='balance' value={data.balance}
                                 onChange={({ target }) => setData({ ...data, balance: target.value })} />
                         </FloatingLabel>

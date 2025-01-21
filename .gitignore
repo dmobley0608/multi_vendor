@@ -24,6 +24,6 @@ staticfiles/
 
 # Environment variables
 .env
-
+.env.production
 # VS Code
 .vscode/

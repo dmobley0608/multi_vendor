@@ -1,5 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
+const apiBaseUrl = 'https://hu.tccs.tech/api/'
+
 const getTokenKey = () => {
   if (!localStorage.getItem('token')) {
     return null
@@ -25,7 +27,7 @@ function getCookie(name) {
 export const Api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: `${import.meta.env.VITE_API_URL}/`,
+    baseUrl:apiBaseUrl,
     prepareHeaders: (headers, { getState }) => {
       const token = getTokenKey()
       if (token) {
