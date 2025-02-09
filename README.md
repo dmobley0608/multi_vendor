@@ -1,6 +1,12 @@
-# Helen Underground
+# Multi-Vendor
 
-Helen Underground is a full-stack web application that uses React for the frontend and Django REST Framework for the backend. This project aims to provide a seamless and efficient user experience by leveraging modern web technologies.
+This project is a multi-vendor full stack application designed to manage store sales inventory for multiple vendors. The frontend is built with React and is served from the root of the backend, which uses Django Rest Framework. Key features include:
+
+Vendor Interface: Enables vendors to view their sales, update inventory, and adjust pricing.
+
+Storefront and Staff Interface: This combined interface allows staff to manage inventory, utilize a cash register feature, and generate weekly, monthly, and yearly reports. It also provides full CRUD (Create, Read, Update, Delete) functionality for inventory items, vendors, and sales. Additionally, it facilitates messaging communication between vendors and the storefront staff, ensuring seamless interaction and coordination.
+
+This comprehensive system ensures efficient inventory management, streamlined vendor communication, and robust sales tracking for a multi-vendor environment.
 
 ## Table of Contents
 - [Features](#features)
@@ -28,55 +34,6 @@ Helen Underground is a full-stack web application that uses React for the fronte
 - Django REST Framework
 - PostgreSQL
 
-## Installation
-
-### Prerequisites
-- Node.js
-- Python 3.x
-- PostgreSQL
-
-### Backend Setup
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/yourusername/helen_underground.git
-    cd helen_underground/backend
-    ```
-2. Create a virtual environment and activate it:
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-    ```
-3. Install the required packages:
-    ```bash
-    pip install -r requirements.txt
-    ```
-4. Set up the database:
-    ```bash
-    python manage.py migrate
-    python manage.py createsuperuser
-    ```
-5. Run the development server:
-    ```bash
-    python manage.py runserver
-    ```
-
-### Frontend Setup
-1. Navigate to the frontend directory:
-    ```bash
-    cd ../frontend
-    ```
-2. Install the required packages:
-    ```bash
-    npm install
-    ```
-3. Start the development server:
-    ```bash
-    npm run dev
-    ```
-
-## Usage
-1. Open your browser and navigate to `http://localhost:5173` for the frontend.
-2. Access the backend API at `http://localhost:8000/api/`.
 
 ## Contributing
 Contributions are welcome! Please fork the repository and create a pull request with your changes.

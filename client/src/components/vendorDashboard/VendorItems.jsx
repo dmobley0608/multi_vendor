@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Table, Button, Modal, Form, Pagination } from 'react-bootstrap'
-import { useGetVendorByIdQuery, useUpdateVendorItemMutation, useAddVendorItemMutation } from '../../services/Api'
+import { useGetVendorByIdQuery, useUpdateVendorItemMutation, useAddVendorItemMutation, useGetVendorByUserQuery } from '../../services/Api'
 import { FaEdit, FaPlus } from 'react-icons/fa'
 
 export default function VendorItems() {
-  const { data: vendorData } = useGetVendorByIdQuery(5487) // Assuming vendor ID is 5487
+  const { data: vendorData } = useGetVendorByUserQuery()
   const [showModal, setShowModal] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
@@ -49,7 +49,7 @@ export default function VendorItems() {
 
       } else {
         const res = await addVendorItem({ ...formData, price: formData.price * 100, vendor: vendorData.id }).unwrap()
-       
+
       }
       setShowModal(false)
     } catch (err) {

@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { Table, Pagination } from 'react-bootstrap'
-import { useGetVendorByIdQuery } from '../../services/Api'
+import { useGetVendorByIdQuery, useGetVendorByUserQuery } from '../../services/Api'
 
 export default function VendorPayments() {
-  const { data: vendorData } = useGetVendorByIdQuery(5487) // Assuming vendor ID is 5487
+  const { data: vendorData } = useGetVendorByUserQuery() 
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
 

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Row, Col, Button, ListGroup, Modal, Form } from 'react-bootstrap'
-import { useGetVendorByIdQuery, useUpdateVendorMutation } from '../../services/Api'
+import { useGetVendorByIdQuery, useGetVendorByUserQuery, useUpdateVendorMutation } from '../../services/Api'
 import Swal from 'sweetalert2'
 import { FaEdit } from 'react-icons/fa'
 
 export default function VendorInfo() {
-  const { data: vendorData } = useGetVendorByIdQuery(5487) // Assuming vendor ID is 5487
+  const { data: vendorData } = useGetVendorByUserQuery()
   const [showModal, setShowModal] = useState(false)
   const [formData, setFormData] = useState({
     store_name: '',
@@ -60,7 +60,7 @@ export default function VendorInfo() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    updateVendor({ id: 5487, ...formData })
+    updateVendor({ id: vendorData.id, ...formData })
     setShowModal(false)
   }
 
