@@ -1,0 +1,162 @@
+.invoice-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  padding: 2rem;
+  position: relative;
+  page-break-after: always;
+}
+
+.print-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #007bff;
+}
+
+.print-button:hover {
+  color: #0056b3;
+}
+
+.store-name {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.store-info {
+  color: #666;
+  line-height: 1.4;
+}
+
+.invoice-title {
+  font-size: 2rem;
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+.invoice-details {
+  color: #666;
+  line-height: 1.4;
+}
+
+.items-table {
+  margin: 2rem 0;
+}
+
+.items-table th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.totals-table {
+  margin-top: 1rem;
+}
+
+.totals-table td {
+  border: none;
+}
+
+.grand-total {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.thank-you {
+  color: #666;
+  font-style: italic;
+}
+
+.print-only {
+  margin: 0;
+  padding: 1rem;
+  max-width: 100%;
+}
+
+.invoice-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background: #fff;
+}
+
+.invoice-wrapper {
+  width: 8.5in;
+  min-height: 11in;
+  margin: 0 auto;
+  padding: 0.5in;
+  background: white;
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+@media print {
+  @page {
+    margin: 0;
+    size: letter;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    visibility: visible !important;
+  }
+
+  .invoice-wrapper {
+    width: 100%;
+    padding: 0.5in;
+    margin: 0;
+    border: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .items-table,
+  .totals-table {
+    page-break-inside: avoid;
+  }
+
+  .invoice-footer {
+    position: fixed;
+    bottom: 0.5in;
+    width: calc(100% - 1in);
+    text-align: center;
+  }
+
+  .invoice-container {
+    padding: 0;
+    margin: 0;
+    border: none;
+  }
+
+  .print-only {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  html,
+  body {
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff;
+    visibility: visible !important;
+  }
+
+  .invoice-page {
+    padding: 0;
+  }
+
+  .invoice-content {
+    display: block !important;
+    visibility: visible !important;
+  }
+}

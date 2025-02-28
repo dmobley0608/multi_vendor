@@ -1,0 +1,35 @@
+.replyContainer {
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+  border-left: 3px solid #dee2e6;
+}
+
+.myReply {
+  text-align: right;
+  border-left-color: #0d6efd;
+  margin-left: 2rem;
+}
+
+.otherReply {
+  border-left-color: #6c757d;
+  margin-right: 2rem;
+}
+
+.replyHeader {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+
+.replyBody {
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.myReplyBody {
+  background-color: #e7f1ff;
+}
+
+.otherReplyBody {
+  background-color: #f8f9fa;
+}

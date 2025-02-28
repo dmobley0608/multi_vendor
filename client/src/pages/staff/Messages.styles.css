@@ -1,0 +1,21 @@
+.recipient-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 5px;
+  padding: 5px;
+  background-color: #e9ecef;
+  border-radius: 3px;
+}
+
+.recipient-badge button {
+  margin-left: 5px;
+  color: #dc3545;
+  font-size: 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.recipient-list {
+  display: inline;
+}

@@ -1,0 +1,370 @@
+/* General Styles */
+body {
+  margin: 0;
+  padding: 0;
+}
+.report-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.company-name {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.company-details {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.report-title {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.report-meta {
+  font-size: 0.9rem;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+  color: #333;
+}
+
+.subsection-title {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 0.25rem 0;
+  color: #444;
+}
+
+.financial-table {
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+}
+
+.report-financials {
+  page-break-inside: avoid;
+}
+
+/* Table Styles */
+.summary-table,
+.transaction-table {
+  width: 100%;
+  margin-bottom: 2rem;
+  border: 1px solid #dee2e6;
+}
+
+.summary-table td {
+  padding: 0.75rem;
+}
+
+.transaction-table th,
+.transaction-table td {
+  padding: 0.5rem;
+  vertical-align: middle;
+}
+
+/* Table alignment styles */
+.summary-table {
+  max-width: 500px !important;
+  margin-left: 0 !important;
+}
+
+.summary-table td:first-child {
+  text-align: left;
+}
+
+.summary-table td:last-child {
+  text-align: right;
+}
+
+.transaction-table th,
+.transaction-table td {
+  text-align: center;
+}
+
+.transaction-table td.text-end {
+  text-align: right;
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .report-container {
+    width: 100%;
+    max-width: none;
+    margin:0;
+    padding: .5in !important;
+  }
+
+  /* Reset Bootstrap's print styles */
+  .table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+
+  .table td,
+  .table th {
+    background-color: #fff !important;
+    padding: 0.25rem !important;
+  }
+
+  .table-bordered th,
+  .table-bordered td {
+    border: 1px solid #dee2e6 !important;
+  }
+
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+  }
+
+  /* Hide unnecessary elements */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Page breaks */
+  .report-details {
+    page-break-before: auto;
+    break-inside: avoid;
+  }
+
+  .details-header {
+    break-after: avoid;
+  }
+
+  .transaction-table {
+    break-inside: auto;
+  }
+
+  .transaction-table tr {
+    break-inside: avoid;
+  }
+
+  .subsection-title {
+    font-size: 12pt;
+    margin: 0.25rem 0;
+  }
+
+  .financial-table {
+    font-size: 10pt;
+    margin-bottom: 0.25rem;
+  }
+
+  /* Font sizes for print */
+  body {
+    font-size: 12pt;
+  }
+
+  .company-name {
+    font-size: 16pt;
+  }
+
+  .report-title {
+    font-size: 14pt;
+  }
+
+  .section-title {
+    font-size: 14pt;
+    margin-bottom: 0.15in;
+  }
+
+
+  /* Adjust content spacing */
+  .report-header {
+    margin-bottom: 0.25rem;
+  }
+
+  .report-summary {
+    margin-bottom: 0.25rem;
+  }
+
+  /* Ensure tables use full width */
+  .summary-table,
+  .transaction-table {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Update table styles for print */
+  .table,
+  .table-bordered,
+  .summary-table,
+  .financial-table,
+  .transaction-table {
+    border: none !important;
+  }
+
+  .table td,
+  .table th,
+  .table-bordered td,
+  .table-bordered th {
+    border: none !important;
+    border-bottom: 1px solid #eee !important;
+    padding: 0.15in 0 !important;
+  }
+
+  /* Remove last border from table rows */
+  .table tr:last-child td,
+  .table-bordered tr:last-child td {
+    border-bottom: none !important;
+  }
+
+  /* Adjust spacing between sections */
+  .report-summary,
+  .report-financials,
+  .report-details {
+    margin-bottom: 0.5in;
+  }
+
+  /* Lighten table header background */
+  thead tr {
+    background-color: #f8f9fa !important;
+  }
+
+  /* Style table headers */
+  th {
+    font-weight: bold;
+    color: #333;
+  }
+
+  /* Adjust striped rows */
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: transparent !important;
+  }
+
+  /* Optimize layout for first page */
+  .report-header {
+    margin-bottom: 0.15in;
+  }
+
+  .report-summary,
+  .report-financials {
+    page-break-inside: avoid;
+    margin-bottom: 0.15in;
+  }
+
+  /* Force first page content */
+  .report-header,
+  .report-summary,
+  .report-financials {
+    page-break-after: avoid;
+  }
+
+  /* Force transaction details to new page */
+  .report-details {
+    page-break-before: always;
+  }
+
+  /* Compress spacing */
+  .table td,
+  .table th {
+    padding: 0.1in 0.1in !important;
+    font-size: 9pt !important;
+  }
+
+  .section-title {
+    margin-bottom: 0.1in;
+    font-size: 12pt;
+  }
+
+  .subsection-title {
+    margin: 0.1in 0;
+    font-size: 10pt;
+  }
+
+  /* Reduce table margins */
+  .summary-table,
+  .financial-table {
+    margin-bottom: 0.15in !important;
+  }
+
+
+
+
+  /* Adjust container and margins for wider tables */
+  .report-container {
+    width: 100vw !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+
+
+  /* Adjust column widths for specific tables */
+  .summary-table td:first-child {
+    width: 60% !important;
+  }
+
+  .transaction-table th,
+  .transaction-table td {
+    padding: 0.1in 0.15in !important;
+  }
+
+  /* Specific column widths for transaction details */
+  .transaction-table th:nth-child(1),
+  .transaction-table td:nth-child(1) {
+    width: 15% !important;
+  } /* Date */
+  .transaction-table th:nth-child(2),
+  .transaction-table td:nth-child(2) {
+    width: 30% !important;
+  } /* Description */
+  .transaction-table th:nth-child(3),
+  .transaction-table td:nth-child(3) {
+    width: 10% !important;
+  } /* Quantity */
+  .transaction-table th:nth-child(4),
+  .transaction-table td:nth-child(4) {
+    width: 15% !important;
+  } /* Price */
+  .transaction-table th:nth-child(5),
+  .transaction-table td:nth-child(5) {
+    width: 15% !important;
+  } /* Total */
+  .transaction-table th:nth-child(6),
+  .transaction-table td:nth-child(6) {
+    width: 15% !important;
+  } /* Payment Method */
+
+  /* Adjust page margins */
+  @page {
+    margin: 0.5in;
+  }
+
+  .summary-table {
+    max-width: 400px !important;
+    margin-left: 0 !important;
+  }
+
+  /* Override any conflicting alignments in print */
+  .summary-table td:first-child {
+    text-align: left !important;
+  }
+
+  .summary-table td:last-child {
+    text-align: right !important;
+  }
+
+  .transaction-table th,
+  .transaction-table td {
+    text-align: center !important;
+  }
+
+  .transaction-table td.text-end {
+    text-align: right !important;
+  }
+}

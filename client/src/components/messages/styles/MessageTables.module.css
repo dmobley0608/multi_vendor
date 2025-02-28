@@ -1,0 +1,16 @@
+.messageRow {
+  font-weight: normal !important;
+}
+
+.messageRow.unread {
+  font-weight: 600 !important;
+}
+
+.messageRow td {
+  font-weight: inherit !important;
+}
+
+.messageRow:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}

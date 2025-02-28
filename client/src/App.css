@@ -1,0 +1,74 @@
+#root {
+  max-width: 100vw;
+  margin: 0 auto;
+  text-align: center;
+  min-height: 100vh;
+  color: black;
+}
+
+#loginForm{
+  max-width: 600px;
+}
+body{
+  overflow-x: hidden;
+  width: 100vw;
+  min-height: 100vh;
+}
+
+.nav-item .active,
+.tab-pane .row ,
+.active{
+  background-color:inherit !important;
+  color:black !important;
+}
+
+
+/* Ensure the background color for the tabs is set correctly */
+.nav-tabs .nav-link {
+  color: #000; /* Set your desired tab font color */
+  background-color: #fff; /* Set your desired tab background color */
+}
+
+.nav-tabs .nav-link.active {
+  color: #fff; /* Set your desired active tab font color */
+  background-color: #007bff; /* Set your desired active tab background color */
+}
+
+/* Ensure modals are not faded out */
+.modal-content {
+  /* Set your desired modal background color */
+  color: #000; /* Set your desired modal font color */
+  opacity: 1; /* Ensure modals are not faded out */
+}
+
+/* Additional styles to ensure proper appearance */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5); /* Set your desired backdrop color */
+}
+
+.modal-header, .modal-body, .modal-footer {
+  color: #000; /* Set your desired modal content font color */
+}
+
+/* Ensure buttons have the correct appearance */
+.btn {
+  color: #fff; /* Set your desired button font color */
+  background-color: #007bff; /* Set your desired button background color */
+  border-color: #007bff; /* Set your desired button border color */
+}
+
+.btn:hover {
+  color: #fff; /* Set your desired button hover font color */
+  background-color: #0056b3; /* Set your desired button hover background color */
+  border-color: #0056b3; /* Set your desired button hover border color */
+}
+
+.icon-font-size>*{
+  font-size: 1.25rem;
+}
+
+@media print{
+  #banner{
+    display: none;
+  }
+}
