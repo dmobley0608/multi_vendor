@@ -13,7 +13,7 @@ import BoothRentalRouter from './routes/boothRentalRoutes.js';
 import BalancePaymentRouter from './routes/balancePaymentRoutes.js';
 import MessagesRouter from './routes/messagesRoutes.js';
 import { createStaffAccount } from './controllers/auth.js';
-import { seedDatabase, User } from './models/index.js';
+import { User } from './models/index.js';
 
 import path from 'path';
 import { fileURLToPath } from 'url'; // Import fileURLToPath
@@ -28,7 +28,7 @@ const port = process.env.PORT || 5000;
 
 // CORS configuration
 const corsOptions = {
-    origin: 'http://localhost:5173', // Replace with your frontend URL
+    origin: 'http://localhost:5173', // Replace with your frontend URL 
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -38,17 +38,6 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan('dev'));
 
-// //seedTransactions;
-// app.get('/seed', async (req, res) => {
-//     try {
-//         await seedDatabase();
-//         res.status(200).send('Database seeded');
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send('Error seeding database');
-//     }
-// }
-// );
 
 
 //Handle Static
@@ -75,10 +64,10 @@ const initializeServer = async () => {
         await sequelize.authenticate();
         console.log('Database connected...');
 
-        await sequelize.sync({ logging: false });
+        await sequelize.sync();
         console.log('Database synchronized...');
 
-        const adminUser = await User.findOne({ where: { username: 'mdobbs' } });
+        const adminUser = await User.findOne({ where: { isStaff:true } });
         if (!adminUser) {
             await createStaffAccount();
         }

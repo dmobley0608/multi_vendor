@@ -20,31 +20,49 @@ import TopTen from './pages/staff/reports/TopTen.jsx'
 import Messages from './components/messages/MessagesLayout.jsx'
 import { LoadingProvider } from './context/loadingContext';
 import VendorMonthlyReport from './pages/staff/reports/VendorMonthlyReport.jsx'
+import ConsentPopup from './components/ConsentPopup'
+import Swal from 'sweetalert2'
+import SeedDatabase from './components/SeedDatabase'
+import useGitHubLastUpdate from './hooks/useGitHubLastUpdate'
 
 function App() {
   const { data: settings } = useGetSettingsQuery()
-
+  const lastUpdate = useGitHubLastUpdate('dmobley0608', 'multi_vendor')
 
   document.title = settings?.find(setting => setting.key === 'Store_Name')?.value || 'POS System'
 
+  const formatDate = (date) => {
+    if (!date) return '';
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'numeric',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    }).format(date);
+  };
+
   return (
     <>
-      {/* <div id="banner" className='bg-secondary text-light p-0 mb-2'>
-        <h6>Under Development</h6>
-        Updated 2/26/2025 @ 7:45p.m
+      <div id="banner" className='bg-dark text-light p-0 mb-2'>
+        <h6>DEMONSTRATION PURPOSES ONLY</h6>
+        Updated {formatDate(lastUpdate)}
         <div className='row px-5'>
           <div className='col-6'>
-            <h6 className='text-start'>Admin Username: mdobbs</h6>
-            <h6 className='text-start'>Password: ThePassword123!</h6>
+            <h6 className='text-start'>Admin Username: staffMember</h6>
+            <h6 className='text-start'>Password: Password123</h6>
           </div>
+
           <div className='col-6'>
             <h6 className='text-end'>Vendor Username: First Initial Last Name: ie. hpotter</h6>
             <h6 className='text-end'> Default Password: username + 123! ie. hpotter123!</h6>
           </div>
         </div>
-      </div> */}
+      </div>
       <LoadingProvider>
         <AuthProvider>
+          <ConsentPopup />
           <Routes>
             <Route path='/' element={<Login />} />
             <Route path='staff' element={<RequireAdmin><StaffLayout /></RequireAdmin>}>
@@ -60,7 +78,7 @@ function App() {
             </Route>
             <Route path='/staff/print-invoice/:id' element={<RequireAdmin><PrintInvoice /></RequireAdmin>} />
             <Route path='/staff/reports/monthly/:year/:month' element={<RequireAdmin><MonthlySalesReport /></RequireAdmin>} />
-            <Route path= "/staff/reports/monthly/vendor/:year/:month/:vendorId" element={<RequireAdmin><VendorMonthlyReport /></RequireAdmin>} />
+            <Route path="/staff/reports/monthly/vendor/:year/:month/:vendorId" element={<RequireAdmin><VendorMonthlyReport /></RequireAdmin>} />
             <Route path='/vendor' element={<RequireAuth><VendorDashboard /></RequireAuth>} />
             <Route path='login' element={<Login />} />
 

@@ -1,6 +1,7 @@
 import { Session, User } from "../models/index.js";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+
 export const login = async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -24,6 +25,7 @@ export const login = async (req, res) => {
         const safeUser = { id: user.id, username: user.username, email: user.email, isStaff: user.isStaff };
         res.json({ message: 'Login successful', user: safeUser, token: session.id });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: 'Server error during login', error: error.message });
     }
 }
@@ -58,9 +60,11 @@ export const createStaffAccount = async (req, res) => {
     try {
         const username = process.env.ADMIN_USERNAME;
         const password = process.env.ADMIN_PASSWORD;
-        const user = await User.create({ username,  password, isStaff: true });
+        const hashedPassword =  await bcrypt.hash(password, 10);
+        const user = await User.create({ username,  password:hashedPassword, isStaff: true });
         return true;
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: 'Server error while creating staff account', error: error.message });
         return false;
     }

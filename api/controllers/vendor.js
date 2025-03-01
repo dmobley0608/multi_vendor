@@ -1,4 +1,4 @@
-import { Vendor, User, TransactionItem, Transaction, Settings, VendorPayment, BoothRentalCharge, BalancePayment } from '../models/index.js';
+import { Vendor, User, TransactionItem, Transaction, Settings, VendorPayment, BoothRentalCharge, BalancePayment, Session } from '../models/index.js';
 import { Op } from 'sequelize';
 import { sequelize } from '../config/db.js';
 import bcrypt from 'bcryptjs'
@@ -67,7 +67,6 @@ export const getVendorById = async (req, res) => {
         }
         res.json(vendor);
     } catch (error) {
-        console.log(error)
         res.status(500).json({ message: error.message });
     }
 };
@@ -75,51 +74,24 @@ export const getVendorById = async (req, res) => {
 // Create vendor (staff only)
 export const createVendor = async (req, res) => {
     const { user, ...vendorData } = req.body;
-    let { email } = user;
+    const { email } = user;
     const { firstName, lastName, phoneNumber } = vendorData;
+    let vendor ={}
     try {
         const username = (firstName.charAt(0) + lastName).toLowerCase();
         const formattedPassword = username + '123!';
         const password = await bcrypt.hash(formattedPassword, 10);
-
-        // Set email to null if it's empty or undefined
-        const userEmail = (!email || email.trim() === '') ? null : email.trim();
-
-        const [newUser, created] = await User.findOrCreate({
-            where: { username },
-            defaults: {
-                email: userEmail,
-                isStaff: false,
-                password: password
-            }
-        });
-
-        if (!created) {
-            return res.status(400).json({ message: 'User already exists' });
+        const newUser = await User.findOne({ where: { username } });
+        if (newUser) {
+            vendor = await Vendor.create({ ...vendorData, userId: newUser.id });
+        }else{
+            const newUser = await User.create({ username, email, password });
+            vendor = await Vendor.create({ ...vendorData, userId: newUser.id})
         }
 
-        const vendor = await Vendor.create({
-            ...vendorData,
-            userId: newUser.id
-        });
-
-        res.status(201).json({
-            ...vendor.toJSON(),
-            user: {
-                username: newUser.username,
-                email: newUser.email
-            }
-        });
+        res.status(201).json(vendor);
     } catch (error) {
-        console.error('Vendor creation error:', error);
-        // If user was created but vendor creation failed, clean up the user
-        if (error.name === 'SequelizeValidationError') {
-            try {
-                await User.destroy({ where: { username: (firstName.charAt(0) + lastName).toLowerCase() } });
-            } catch (cleanupError) {
-                console.error('Cleanup error:', cleanupError);
-            }
-        }
+        console.log(error)
         res.status(400).json({ message: error.message });
     }
 };
@@ -183,7 +155,11 @@ export const deleteVendor = async (req, res) => {
             return res.status(404).json({ message: 'Vendor not found' });
         }
         await vendor.destroy();
-        await User.destroy({ where: { id: vendor.userId } });
+        const vendors = await Vendor.findAll({where:{userId:vendor.userId}})
+        if(vendors.length == 0){
+            await Session.destroy({ where: { userId: vendor.userId } });
+            await User.destroy({ where: { id: vendor.userId } });
+        }
         res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -200,7 +176,7 @@ export const getVendorMonthlyReport = async (req, res) => {
 
         // Get store commission rate
         const commissionRate = await Settings.findOne({ where: { key: 'Store_Commission' } });
-        const commission = parseFloat(commissionRate.value/ 100).toFixed(2); ;
+        const commission = parseFloat(commissionRate.value) / 100;
 
         const vendors = await Vendor.findAll({
             include: [
@@ -342,17 +318,7 @@ export const getVendorMonthlyReport = async (req, res) => {
                 totalBalancePayments,
                 monthlyEarnings,
                 monthlyBalance,
-                previousBalance,
-                items: currentMonthItems.map(item => ({
-                    id: item.id,
-                    name: item.name,
-                    quantity: item.quantity,
-                    description: item.description,
-                    price: item.price,
-                    total: item.total,
-                    createdAt: item.createdAt,
-                    paymentMethod: item.transaction.paymentMethod
-                }))
+                previousBalance
             };
         });
 
@@ -370,7 +336,7 @@ export const getVendorMonthlyReport = async (req, res) => {
 export const resetVendorPassword = async (req, res) => {
     try {
         const { id } = req.body;
-     
+        console.log(id)
         const user = await User.findOne({ where: { id } });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -392,7 +358,6 @@ const calculateSalesMetrics = (items, commission) => {
             id: item.id,
             name: item.name,
             quantity: item.quantity,
-            description: item.description,
             price: item.price,
             total: item.total,
             createdAt: item.createdAt,
@@ -408,7 +373,7 @@ export const getVendorByUser = async (req, res) => {
         const settings = await Settings.findOne({ where: { key: 'Store_Commission' } });
         const commission = parseFloat(settings.value) / 100;
 
-        const vendor = await Vendor.findOne({
+        const vendors = await Vendor.findAll({
             where: { userId: req.userId },
             include: [
                 {
@@ -440,60 +405,49 @@ export const getVendorByUser = async (req, res) => {
             ]
         });
 
-        if (!vendor) {
-            return res.status(404).json({ message: 'Vendor not found' });
+        if (!vendors.length) {
+            return res.status(404).json({ message: 'No vendors found for this user' });
         }
 
         const now = new Date();
-        // Set to start of current day (midnight)
-        const startOfDay = new Date(now);
-        startOfDay.setHours(0, 0, 0, 0);
+        const startOfDay = new Date(now).setHours(0, 0, 0, 0);
+        const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay())).setHours(0, 0, 0, 0);
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).setHours(0, 0, 0, 0);
+        const startOfYear = new Date(now.getFullYear(), 0, 1).setHours(0, 0, 0, 0);
 
-        // Set to start of current week (Sunday)
-        const startOfWeek = new Date(now);
-        startOfWeek.setDate(now.getDate() - now.getDay());
-        startOfWeek.setHours(0, 0, 0, 0);
+        const vendorsWithSales = vendors.map(vendor => {
+            const allItems = vendor.transactionItems || [];
 
-        // Set to start of current month
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        startOfMonth.setHours(0, 0, 0, 0);
+            const salesCategories = {
+                daily: calculateSalesMetrics(
+                    allItems.filter(item => new Date(item.createdAt) >= startOfDay),
+                    commission
+                ),
+                weekly: calculateSalesMetrics(
+                    allItems.filter(item => new Date(item.createdAt) >= startOfWeek),
+                    commission
+                ),
+                monthly: calculateSalesMetrics(
+                    allItems.filter(item => new Date(item.createdAt) >= startOfMonth),
+                    commission
+                ),
+                yearly: calculateSalesMetrics(
+                    allItems.filter(item => new Date(item.createdAt) >= startOfYear),
+                    commission
+                ),
+                allTime: calculateSalesMetrics(allItems, commission)
+            };
 
-        // Set to start of current year
-        const startOfYear = new Date(now.getFullYear(), 0, 1);
-        startOfYear.setHours(0, 0, 0, 0);
+            const vendorData = vendor.toJSON();
+            delete vendorData.transactionItems;
 
-        const allItems = vendor.transactionItems || [];
+            return {
+                ...vendorData,
+                sales: salesCategories
+            };
+        });
 
-        const salesCategories = {
-            daily: calculateSalesMetrics(
-                allItems.filter(item => {
-                    const itemDate = new Date(item.createdAt);
-                    return itemDate >= startOfDay;
-                }),
-                commission
-            ),
-            weekly: calculateSalesMetrics(
-                allItems.filter(item => new Date(item.createdAt) >= startOfWeek),
-                commission
-            ),
-            monthly: calculateSalesMetrics(
-                allItems.filter(item => new Date(item.createdAt) >= startOfMonth),
-                commission
-            ),
-            yearly: calculateSalesMetrics(
-                allItems.filter(item => new Date(item.createdAt) >= startOfYear),
-                commission
-            ),
-            allTime: calculateSalesMetrics(allItems, commission)
-        };
-
-        const response = {
-            ...vendor.toJSON(),
-            transactionItems: undefined, // Remove the original transactionItems
-            sales: salesCategories
-        };
-
-        res.json(response);
+        res.json(vendorsWithSales);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: error.message });

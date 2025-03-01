@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/db.js";
-import {  timeStampConfig } from '../utils/timeZone.js';
+import { timeStampConfig } from '../utils/timeZone.js';
 
 const Transaction = sequelize.define('Transaction', {
     id: {
@@ -33,15 +33,16 @@ const Transaction = sequelize.define('Transaction', {
             if (transaction.changed('salesTax') || !transaction.subTotal) {
                 const items = await transaction.getItems();
 
-                // Calculate subtotal from items
+                // Calculate subtotal from items with explicit rounding
                 const subTotal = items.reduce((sum, item) => {
-                    return sum + (item.price * item.quantity);
+                    return sum + Math.round(item.price * item.quantity);
                 }, 0);
-                
-                transaction.subTotal = subTotal;
-                transaction.total = subTotal + transaction.salesTax;
+
+                transaction.subTotal = Math.round(subTotal);
+                transaction.total = Math.round(transaction.subTotal + transaction.salesTax);
             }
-            transaction.total = transaction.subTotal + transaction.salesTax;
+            // Ensure final total is properly rounded
+            transaction.total = Math.round(transaction.subTotal + transaction.salesTax);
         }
     }
 });
@@ -49,8 +50,10 @@ const Transaction = sequelize.define('Transaction', {
 // Instance method to recalculate totals
 Transaction.prototype.recalculateTotals = async function () {
     const items = await this.getItems();
-    this.subTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    this.total = this.subTotal + this.salesTax;
+    this.subTotal = Math.round(items.reduce((sum, item) =>
+        sum + Math.round(item.price * item.quantity), 0)
+    );
+    this.total = Math.round(this.subTotal + this.salesTax);
     await this.save();
 };
 

@@ -14,7 +14,7 @@ User.hasMany(Session);
 Session.belongsTo(User);
 
 // Update the Vendor-User association
-User.hasOne(Vendor, {
+User.hasMany(Vendor, {
     foreignKey: 'userId'
 });
 Vendor.belongsTo(User, {
@@ -91,63 +91,6 @@ Message.belongsTo(User, {
 });
 
 
-export const seedDatabase = async () => {
-    const vendors = [5150, 100, 2806];
-    const getRandomDate = () => {
-        const now = new Date();
-        const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
-        return new Date(thirtyDaysAgo.getTime() + Math.random() * (now.getTime() - thirtyDaysAgo.getTime()));
-    };
-
-    for (let i = 0; i < 50; i++) {
-        const date = getRandomDate()
-        const transaction = await Transaction.create({
-            createdAt: date,
-            paymentMethod: Math.random() > 0.5 ? 'CASH' : 'CARD',
-            total: 0,
-            salesTax: 0
-        });
-
-        const numItems = Math.floor(Math.random() * 3) + 1;
-
-        for (let j = 0; j < numItems; j++) {
-            const price = Math.floor(Math.random() * 1000) + 1;
-            const quantity = 1;
-            const vendorId = vendors[Math.floor(Math.random() * vendors.length)];
-
-            let transactionItem = await TransactionItem.create({
-                createdAt: date,
-                transactionId: transaction.id,
-                vendorId: vendorId,
-                price: price,
-                quantity: quantity,
-                description: `Item ${j + 1}`
-            });
-
-            const vendor = await transactionItem.getVendor();
-            const commissionRate = await Settings.findOne({ where: { key: 'Store_Commission' } });
-            const commission = Math.round(((price * quantity) * (.13)));
-            vendor.balance += Math.round(transactionItem.total - commission);
-            await vendor.save();
-        }
-
-        // Get items and calculate totals
-        const items = await TransactionItem.findAll({
-            where: { transactionId: transaction.id }
-        });
-
-        const subtotal = items.reduce((acc, item) => acc + item.total, 0);
-        const salesTax = Math.round(subtotal * 0.07);
-        const total = subtotal + salesTax;
-
-        // Update transaction with calculated values
-        await transaction.update({
-            subtotal: subtotal,
-            salesTax: salesTax,
-            total: total
-        });
-    }
-};
 
 export {
     User,

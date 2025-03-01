@@ -20,7 +20,6 @@ const Vendor = sequelize.define('Vendor', {
     phoneNumber: {
         type: DataTypes.STRING,
         allowNull: true,
-        unique: true
     },
     alternateNumber: {
         type: DataTypes.STRING,

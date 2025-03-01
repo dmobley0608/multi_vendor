@@ -107,19 +107,18 @@ export const deleteTransaction = async (req, res) => {
         if (!transaction) {
             return res.status(404).json({ message: 'Transaction not found' });
         }
-        let vendor = null;
+
         if (transaction.items && transaction.items.length > 0) {
-            transaction.items.forEach(async item => {
-                vendor = await item.getVendor();
+            for (const item of transaction.items) {
+                const vendor = await Vendor.findByPk(item.vendorId);
                 const commissionRate = await Settings.findOne({ where: { key: 'Store_Commission' } });
                 const commission = Math.round(item.total * (parseFloat(commissionRate.value) / 100));
-                const balance = vendor.balance -  Math.round(item.total - commission);
-                await vendor.update({ balance });
+                vendor.balance -= Math.round(item.total - commission);
+                await vendor.save();
                 await item.destroy();
             }
-            );
-
         }
+
         await transaction.destroy();
         res.status(204).send();
     } catch (error) {
@@ -176,7 +175,7 @@ export const deleteTransactionItem = async (req, res) => {
         vendor.balance -= Math.round(item.total - commission);
         await vendor.save();
         await item.destroy();
-        const transaction = await Transaction.findByPk(item.transactionId, {include: ['items']});
+        const transaction = await Transaction.findByPk(item.transactionId, { include: ['items'] });
         if (transaction.items.length === 0) {
             await transaction.destroy();
         } else {
