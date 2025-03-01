@@ -76,7 +76,7 @@ export const createVendor = async (req, res) => {
     const { user, ...vendorData } = req.body;
     const { email } = user;
     const { firstName, lastName, phoneNumber } = vendorData;
-    let vendor ={}
+    let vendor = {}
     try {
         const username = (firstName.charAt(0) + lastName).toLowerCase();
         const formattedPassword = username + '123!';
@@ -84,9 +84,9 @@ export const createVendor = async (req, res) => {
         const newUser = await User.findOne({ where: { username } });
         if (newUser) {
             vendor = await Vendor.create({ ...vendorData, userId: newUser.id });
-        }else{
+        } else {
             const newUser = await User.create({ username, email, password });
-            vendor = await Vendor.create({ ...vendorData, userId: newUser.id})
+            vendor = await Vendor.create({ ...vendorData, userId: newUser.id })
         }
 
         res.status(201).json(vendor);
@@ -155,8 +155,8 @@ export const deleteVendor = async (req, res) => {
             return res.status(404).json({ message: 'Vendor not found' });
         }
         await vendor.destroy();
-        const vendors = await Vendor.findAll({where:{userId:vendor.userId}})
-        if(vendors.length == 0){
+        const vendors = await Vendor.findAll({ where: { userId: vendor.userId } })
+        if (vendors.length == 0) {
             await Session.destroy({ where: { userId: vendor.userId } });
             await User.destroy({ where: { id: vendor.userId } });
         }
@@ -176,7 +176,7 @@ export const getVendorMonthlyReport = async (req, res) => {
 
         // Get store commission rate
         const commissionRate = await Settings.findOne({ where: { key: 'Store_Commission' } });
-        const commission = parseFloat(commissionRate.value) / 100;
+        const commission = parseInt(commissionRate.value);
 
         const vendors = await Vendor.findAll({
             include: [
@@ -214,7 +214,7 @@ export const getVendorMonthlyReport = async (req, res) => {
             ]
         });
 
-        const vendorReports = vendors.map(vendor => {
+        const vendorReports = await Promise.all(vendors.map(async vendor => {
             // Calculate all-time totals excluding current month
             const allItems = vendor.transactionItems || [];
 
@@ -225,7 +225,7 @@ export const getVendorMonthlyReport = async (req, res) => {
             });
 
             const allTimeSales = historicalItems.reduce((sum, item) => sum + item.total, 0);
-            const allTimeCommission = Math.round(allTimeSales * commission);
+            const allTimeCommission = Math.round((allTimeSales * commission) / 100);
 
             // Filter booth rentals excluding current month
             const historicalBoothRental = vendor.boothRentalCharges
@@ -264,7 +264,7 @@ export const getVendorMonthlyReport = async (req, res) => {
                 .filter(item => item.transaction.paymentMethod === 'CARD')
                 .reduce((sum, item) => sum + item.total, 0);
             const totalSales = cashSales + cardSales;
-            const storeCommission = Math.round(totalSales * commission);
+            const storeCommission = Math.round((totalSales * commission) / 100);
 
             const boothRental = vendor.boothRentalCharges.filter(c => c.year === parseInt(year) && c.month === parseInt(month))?.reduce((sum, charge) => sum + charge.amount, 0) || 0;
             const payments = vendor.payments.filter(p => p.month === parseInt(month) && p.year === parseInt(year)) || [];
@@ -282,6 +282,15 @@ export const getVendorMonthlyReport = async (req, res) => {
 
             // Update monthlyBalance calculation
             const monthlyBalance = (monthlyEarnings) + previousBalance - totalPayments + totalBalancePayments;
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth() + 1; // Add 1 because months are 0-indexed
+            const currentYear = currentDate.getFullYear();
+
+            // Update vendor's balance if we're generating report for current month/year
+            if (parseInt(month) === currentMonth && parseInt(year) === currentYear) {
+                console.log("updating balance")
+                await vendor.update({ balance: monthlyBalance });
+            }
 
             return {
                 id: vendor.id,
@@ -320,7 +329,7 @@ export const getVendorMonthlyReport = async (req, res) => {
                 monthlyBalance,
                 previousBalance
             };
-        });
+        }));
 
         res.json({
             month: parseInt(month),
@@ -352,7 +361,7 @@ export const resetVendorPassword = async (req, res) => {
 
 const calculateSalesMetrics = (items, commission) => {
     const totalAmount = items.reduce((sum, item) => sum + item.total, 0);
-    const storeCommission = totalAmount * commission;
+    const storeCommission = Math.round((totalAmount * commission) / 100);
     return {
         items: items.map(item => ({
             id: item.id,
@@ -371,7 +380,7 @@ const calculateSalesMetrics = (items, commission) => {
 export const getVendorByUser = async (req, res) => {
     try {
         const settings = await Settings.findOne({ where: { key: 'Store_Commission' } });
-        const commission = parseFloat(settings.value) / 100;
+        const commission = parseInt(settings.value);
 
         const vendors = await Vendor.findAll({
             where: { userId: req.userId },

@@ -48,6 +48,7 @@ function App() {
       <div id="banner" className='bg-dark text-light p-0 mb-2'>
         <h6>DEMONSTRATION PURPOSES ONLY</h6>
         Updated {formatDate(lastUpdate)}
+        <SeedDatabase numTransactions={1200}/>
         <div className='row px-5'>
           <div className='col-6'>
             <h6 className='text-start'>Admin Username: staffMember</h6>

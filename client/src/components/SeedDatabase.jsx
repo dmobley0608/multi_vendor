@@ -2,7 +2,7 @@ import { useGetSettingsQuery, useGetVendorsQuery } from '../services/Api'
 import { useCreateTransactionMutation } from '../services/TransactionApi'
 import Swal from 'sweetalert2'
 
-const SeedDatabase = () => {
+const SeedDatabase = ({numTransactions=5}) => {
     const [createTransaction] = useCreateTransactionMutation()
     const { data: vendors } = useGetVendorsQuery()
     const { data: settings } = useGetSettingsQuery()
@@ -26,10 +26,10 @@ const SeedDatabase = () => {
             throw new Error('No vendors available');
         }
 
-        const items = Array.from({ length: numItems }, () => {
+        const items = Array.from({ length: 1 }, () => {
             // Ensure price is a whole number in cents
-            const priceInCents = Math.floor(Math.random() * 10000);
-            const quantity = Math.floor(Math.random() * 10) + 1;
+            const priceInCents = Math.round(Math.floor(Math.random() * 10000));
+            const quantity =3;
 
             return {
                 quantity,
@@ -44,7 +44,7 @@ const SeedDatabase = () => {
         const subTotal = items.reduce((sum, item) =>
             sum + (Math.round(item.price) * Math.round(item.quantity)), 0
         );
-        const salesTax = Math.round((subTotal * (parseFloat(salesTaxRate) / 100)));
+        const salesTax = Math.round((subTotal * parseInt(salesTaxRate)) / 100);
 
         return {
             items,
@@ -57,7 +57,7 @@ const SeedDatabase = () => {
     const seedDatabase = async (e) => {
         e.preventDefault();
         try {
-            const numTransactions = 5;
+
             let currentTransaction = 0;
 
             // Show loading alert
@@ -65,7 +65,7 @@ const SeedDatabase = () => {
                 title: 'Seeding Database',
                 html: 'Progress: <b>0%</b>',
                 allowOutsideClick: false,
-                
+
             });
 
             // Process transactions sequentially

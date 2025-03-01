@@ -3,6 +3,8 @@ import { Op } from 'sequelize';
 
 export const createTransaction = async (req, res) => {
     let transaction;
+    const commissionRate = await Settings.findOne({ where: { key: 'Store_Commission' } });
+    const commissionPercentage =parseInt(commissionRate.value);
     try {
         const { items, salesTax, paymentMethod } = req.body;
 
@@ -19,10 +21,9 @@ export const createTransaction = async (req, res) => {
                 total: item.price * item.quantity
             });
             const vendor = await transactionItem.getVendor();
-            const commissionRate = await Settings.findOne({ where: { key: 'Store_Commission' } });
-            const commission = Math.round(transactionItem.total * (parseFloat(commissionRate.value) / 100));
-            vendor.balance += Math.round(transactionItem.total - commission);
-            await vendor.save();
+            const commission = Math.round((transactionItem.total * commissionPercentage) / 100);
+            const balance = vendor.balance + ( transactionItem.total - commission);
+            await vendor.update({ balance });
         }
 
         // Recalculate totals after items are added
@@ -112,7 +113,7 @@ export const deleteTransaction = async (req, res) => {
             for (const item of transaction.items) {
                 const vendor = await Vendor.findByPk(item.vendorId);
                 const commissionRate = await Settings.findOne({ where: { key: 'Store_Commission' } });
-                const commission = Math.round(item.total * (parseFloat(commissionRate.value) / 100));
+                const commission = Math.round((item.total * parseInt(commissionRate.value)) / 100);
                 vendor.balance -= Math.round(item.total - commission);
                 await vendor.save();
                 await item.destroy();
@@ -134,7 +135,7 @@ export const updateTransactionItem = async (req, res) => {
         }
         //Get Current Commission Rate
         const commissionRate = await Settings.findOne({ where: { key: 'Store_Commission' } });
-        const totalCommission = item.total * (parseFloat(commissionRate.value) / 100);
+        const totalCommission =Math.round((item.total * parseInt(commissionRate.value)) / 100);
         //Update Vendor Balance - remove previous profit
         let vendor = await item.getVendor();
         vendor.balance -= Math.round(item.total - totalCommission)
@@ -146,7 +147,7 @@ export const updateTransactionItem = async (req, res) => {
         vendor = await item.getVendor();
         await item.save()
         //Update Vendor Balance with new profit
-        const commission = Math.round(item.total * (parseFloat(commissionRate.value) / 100))
+        const commission = Math.round((item.total * parseInt(commissionRate.value)) / 100);
         console.log(commission)
         vendor.balance += Math.round(item.total - commission)
         await vendor.save();
@@ -154,7 +155,7 @@ export const updateTransactionItem = async (req, res) => {
         const transaction = await Transaction.findByPk(item.transactionId);
         await transaction.recalculateTotals()
         const salesTaxRate = await Settings.findOne({ where: { key: 'Sales_Tax' } });
-        transaction.salesTax = Math.round(transaction.subTotal * (parseFloat(salesTaxRate.value) / 100));
+        transaction.salesTax = Math.round((transaction.subTotal * parseInt(salesTaxRate.value)) / 100);
         transaction.updatedAt = new Date()
         await transaction.save()
         res.json(item);
@@ -171,7 +172,7 @@ export const deleteTransactionItem = async (req, res) => {
         }
         const vendor = await item.getVendor();
         const commissionRate = await Settings.findOne({ where: { key: 'Store_Commission' } });
-        const commission = Math.round(item.total * (parseFloat(commissionRate.value) / 100));
+        const commission = Math.round((item.total * parseInt(commissionRate.value)) / 100);
         vendor.balance -= Math.round(item.total - commission);
         await vendor.save();
         await item.destroy();
@@ -181,7 +182,7 @@ export const deleteTransactionItem = async (req, res) => {
         } else {
             await transaction.recalculateTotals()
             const salesTaxRate = await Settings.findOne({ where: { key: 'Sales_Tax' } });
-            transaction.salesTax = Math.round(transaction.subTotal * (parseFloat(salesTaxRate.value) / 100));
+            transaction.salesTax = Math.round((transaction.subTotal * parseInt(salesTaxRate.value)) / 100);
             transaction.updatedAt = new Date()
             await transaction.save()
         }
