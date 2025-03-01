@@ -296,7 +296,7 @@ const MonthlySalesSummary = () => {
                       <PaymentActions
                         vendorId={vendor.id}
                         payment={getCurrentMonthPayment(vendor.payments)}
-                        grossProfit={(vendor.monthlyBalance + (vendor.previousBalance))}
+                        grossProfit={(vendor.monthlyBalance)}
                         currentBalance={vendor.currentBalance}
                         year={selectedYear}
                         month={selectedMonth}
